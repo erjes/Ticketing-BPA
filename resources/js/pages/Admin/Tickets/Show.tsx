@@ -1,11 +1,12 @@
-import { Head, useForm, Link, usePage } from '@inertiajs/react';
+import { Head, useForm, Link } from '@inertiajs/react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { dashboard } from '@/routes/admin';
 import { status, reply, update, destroy } from '@/routes/admin/tickets';
 import { useState } from 'react';
@@ -13,7 +14,6 @@ import ReactMarkdown from 'react-markdown';
 
 export default function Show({ ticket, categories }: { ticket: any, categories: string[] }) {
     const { auth } = usePage().props as any;
-    
     const { data: statusData, setData: setStatusData, post: postStatus, processing: processingStatus } = useForm({
         status: ticket.status,
     });
@@ -69,7 +69,7 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                         <h1 className="text-2xl font-bold">Ticket: {ticket.ticket_number}</h1>
                         <p className="text-muted-foreground">Oleh: {ticket.user?.name} ({ticket.user?.nim_nip})</p>
                     </div>
-                    
+
                     <div className="flex gap-2 items-center">
                         <form onSubmit={updateStatus} className="flex gap-2 items-center mr-4">
                             <Select value={statusData.status} onValueChange={(v) => setStatusData('status', v)}>
@@ -85,7 +85,7 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                             </Select>
                             <Button type="submit" variant="outline" disabled={processingStatus}>Update Status</Button>
                         </form>
-                        
+
                         <Dialog open={editOpen} onOpenChange={setEditOpen}>
                             <DialogTrigger asChild>
                                 <Button variant="secondary">Edit Ticket</Button>
@@ -169,8 +169,8 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                                 <h3 className="text-lg font-semibold">Riwayat Percakapan</h3>
                                 {ticket.replies.map((reply: any) => (
                                     <Card key={reply.id} className={
-                                        reply.is_internal ? 'border-yellow-200 bg-yellow-50/50' : 
-                                        (reply.user_id === ticket.user_id ? 'border-primary/20 bg-primary/5' : '')
+                                        reply.is_internal ? 'border-yellow-200 bg-yellow-50/50' :
+                                            (reply.user_id === ticket.user_id ? 'border-primary/20 bg-primary/5' : '')
                                     }>
                                         <CardContent className="p-4 flex flex-col gap-2">
                                             <div className="flex justify-between text-sm text-muted-foreground">
@@ -203,8 +203,8 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                                     />
                                     <div className="flex justify-between items-center">
                                         <label className="flex items-center gap-2 cursor-pointer">
-                                            <input 
-                                                type="checkbox" 
+                                            <input
+                                                type="checkbox"
                                                 checked={replyData.is_internal}
                                                 onChange={e => setReplyData('is_internal', e.target.checked)}
                                                 className="w-4 h-4 rounded border-gray-300"

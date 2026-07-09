@@ -9,14 +9,49 @@ use Inertia\Inertia;
 
 class TicketController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->query('search');
+        $searchResults = null;
+
+        if ($search) {
+            $searchResults = Ticket::with('user')
+                ->where(function ($q) use ($search) {
+                    $q->where('ticket_number', 'like', "%{$search}%")
+                        ->orWhere('category', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($qu) use ($search) {
+                            $qu->where('name', 'like', "%{$search}%")
+                                ->orWhere('nim_nip', 'like', "%{$search}%");
+                        });
+                })
+                ->latest()
+                ->get();
+        }
+
+        $dbCounts = Ticket::select('category', \DB::raw('count(*) as total'))
+            ->groupBy('category')
+            ->pluck('total', 'category')
+            ->toArray();
+
+        $categoryCounts = [
+            'Data Sertifikasi Dosen' => $dbCounts['Data Sertifikasi Dosen'] ?? 0,
+            'Data Mahasiswa' => $dbCounts['Data Mahasiswa'] ?? 0,
+            'Program Magang Berdampak' => $dbCounts['Program Magang Berdampak'] ?? 0,
+            'Data Kerjasama' => $dbCounts['Data Kerjasama'] ?? 0,
+        ];
+
         return Inertia::render('Admin/Dashboard', [
             'stats' => [
                 'open' => Ticket::where('status', 'Open')->count(),
                 'in_progress' => Ticket::where('status', 'In Progress')->count(),
                 'resolved' => Ticket::where('status', 'Resolved')->count(),
-            ]
+            ],
+            'categoryCounts' => $categoryCounts,
+            'searchResults' => $searchResults,
+            'filters' => [
+                'search' => $search ?? '',
+            ],
         ]);
     }
 
@@ -113,7 +148,7 @@ class TicketController extends Controller
     {
         $request->validate([
             'message' => 'required|string',
-            'is_internal' => 'boolean'
+            'is_internal' => 'boolean',
         ]);
 
         $reply = $ticket->replies()->create([

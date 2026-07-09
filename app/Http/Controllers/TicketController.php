@@ -20,8 +20,9 @@ class TicketController extends Controller
     public function tickets(Request $request)
     {
         $tickets = Ticket::where('user_id', $request->user()->id)->latest()->get();
-        return Inertia::render('Tickets/Index', [
-            'tickets' => $tickets
+
+        return Inertia::render('Dashboard', [
+            'tickets' => $tickets,
         ]);
     }
 
@@ -44,7 +45,7 @@ class TicketController extends Controller
 
         $ticket = DB::transaction(function () use ($request) {
             $maxId = Ticket::lockForUpdate()->max('id') ?? 0;
-            $ticketNumber = 'BPA-' . date('Y') . '-' . str_pad($maxId + 1, 3, '0', STR_PAD_LEFT);
+            $ticketNumber = 'BPA-'.date('Y').'-'.str_pad($maxId + 1, 3, '0', STR_PAD_LEFT);
 
             $ticket = Ticket::create([
                 'ticket_number' => $ticketNumber,
@@ -92,7 +93,7 @@ class TicketController extends Controller
         }, 'admin']);
 
         return Inertia::render('Tickets/Show', [
-            'ticket' => $ticket
+            'ticket' => $ticket,
         ]);
     }
 
@@ -122,5 +123,35 @@ class TicketController extends Controller
 
         return back();
     }
-}
 
+    public function categoryIndex(Request $request)
+    {
+        $category = $request->query('category');
+        $search = $request->query('search');
+
+        $query = Ticket::with('user')
+            ->where('category', $category)
+            ->latest();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('ticket_number', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($qu) use ($search) {
+                        $qu->where('name', 'like', "%{$search}%")
+                            ->orWhere('nim_nip', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $tickets = $query->get();
+
+        return Inertia::render('Admin/Tickets/CategoryIndex', [
+            'category' => $category,
+            'tickets' => $tickets,
+            'filters' => [
+                'search' => $search ?? '',
+            ],
+        ]);
+    }
+}

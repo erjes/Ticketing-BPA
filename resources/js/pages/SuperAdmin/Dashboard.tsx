@@ -1,9 +1,9 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LogOut } from 'lucide-react';
 import { Link } from '@inertiajs/react';
+import { LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { logout } from '@/routes';
 import { role } from '@/routes/superadmin/users';
 

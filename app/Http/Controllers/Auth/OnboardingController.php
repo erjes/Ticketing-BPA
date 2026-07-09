@@ -47,4 +47,3 @@ class OnboardingController extends Controller
         };
     }
 }
-

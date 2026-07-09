@@ -12,8 +12,9 @@ class UserController extends Controller
     public function index()
     {
         $users = User::latest()->get();
+
         return Inertia::render('SuperAdmin/Dashboard', [
-            'users' => $users
+            'users' => $users,
         ]);
     }
 
