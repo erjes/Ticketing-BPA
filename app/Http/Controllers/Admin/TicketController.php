@@ -34,12 +34,13 @@ class TicketController extends Controller
             ->pluck('total', 'category')
             ->toArray();
 
-        $categoryCounts = [
-            'Data Sertifikasi Dosen' => $dbCounts['Data Sertifikasi Dosen'] ?? 0,
-            'Data Mahasiswa' => $dbCounts['Data Mahasiswa'] ?? 0,
-            'Program Magang Berdampak' => $dbCounts['Program Magang Berdampak'] ?? 0,
-            'Data Kerjasama' => $dbCounts['Data Kerjasama'] ?? 0,
-        ];
+        $categories = \App\Models\TicketCategory::all()->map(function ($cat) use ($dbCounts) {
+            return [
+                'name' => $cat->name,
+                'description' => $cat->description,
+                'count' => $dbCounts[$cat->name] ?? 0,
+            ];
+        });
 
         return Inertia::render('Admin/Dashboard', [
             'stats' => [
@@ -47,7 +48,7 @@ class TicketController extends Controller
                 'in_progress' => Ticket::where('status', 'In Progress')->count(),
                 'resolved' => Ticket::where('status', 'Resolved')->count(),
             ],
-            'categoryCounts' => $categoryCounts,
+            'categories' => $categories,
             'searchResults' => $searchResults,
             'filters' => [
                 'search' => $search ?? '',

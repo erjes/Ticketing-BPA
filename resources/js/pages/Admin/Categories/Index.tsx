@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { store, update, destroy } from '@/routes/admin/categories';
 
@@ -13,10 +14,12 @@ export default function Index({ categories }: { categories: any[] }) {
 
     const { data: createData, setData: setCreateData, post: postCreate, processing: processingCreate, reset: resetCreate, errors: createErrors } = useForm({
         name: '',
+        description: '',
     });
 
     const { data: editData, setData: setEditData, put: putEdit, processing: processingEdit, reset: resetEdit, errors: editErrors } = useForm({
         name: '',
+        description: '',
     });
 
     const { delete: destroyCategory, processing: processingDestroy } = useForm();
@@ -43,7 +46,10 @@ export default function Index({ categories }: { categories: any[] }) {
 
     const openEdit = (category: any) => {
         setEditCategory(category);
-        setEditData('name', category.name);
+        setEditData({
+            name: category.name,
+            description: category.description || '',
+        });
     };
 
     const handleDelete = (id: number, name: string) => {
@@ -80,6 +86,16 @@ export default function Index({ categories }: { categories: any[] }) {
                                     />
                                     {createErrors.name && <p className="text-sm text-red-500">{createErrors.name}</p>}
                                 </div>
+                                <div className="space-y-2">
+                                    <Label>Deskripsi</Label>
+                                    <Textarea
+                                        value={createData.description}
+                                        onChange={e => setCreateData('description', e.target.value)}
+                                        placeholder="Penjelasan singkat kategori ini"
+                                        rows={3}
+                                    />
+                                    {createErrors.description && <p className="text-sm text-red-500">{createErrors.description}</p>}
+                                </div>
                                 <DialogFooter>
                                     <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>Batal</Button>
                                     <Button type="submit" disabled={processingCreate}>Simpan</Button>
@@ -102,7 +118,10 @@ export default function Index({ categories }: { categories: any[] }) {
                             {categories && categories.length > 0 ? categories.map((cat, idx) => (
                                 <tr key={cat.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-4 py-3">{idx + 1}</td>
-                                    <td className="px-4 py-3 font-medium">{cat.name}</td>
+                                    <td className="px-4 py-3 font-medium">
+                                        <div>{cat.name}</div>
+                                        {cat.description && <div className="text-xs text-muted-foreground mt-1 font-normal">{cat.description}</div>}
+                                    </td>
                                     <td className="px-4 py-3 text-right">
                                         <div className="flex justify-end gap-2">
                                             <Button variant="ghost" size="sm" onClick={() => openEdit(cat)}>Edit</Button>
@@ -136,6 +155,15 @@ export default function Index({ categories }: { categories: any[] }) {
                                     onChange={e => setEditData('name', e.target.value)}
                                 />
                                 {editErrors.name && <p className="text-sm text-red-500">{editErrors.name}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Deskripsi</Label>
+                                <Textarea
+                                    value={editData.description}
+                                    onChange={e => setEditData('description', e.target.value)}
+                                    rows={3}
+                                />
+                                {editErrors.description && <p className="text-sm text-red-500">{editErrors.description}</p>}
                             </div>
                             <DialogFooter>
                                 <Button type="button" variant="outline" onClick={() => setEditCategory(null)}>Batal</Button>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Halaman Formulir Tiket Pengguna - BPA Ticketing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#1b1c1c",
+                        "surface": "#fbf9f8",
+                        "surface-bright": "#fbf9f8",
+                        "on-tertiary-fixed": "#111d23",
+                        "surface-container": "#f0eded",
+                        "primary-container": "#d32f2f",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e4e2e1",
+                        "outline-variant": "#e4beba",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#dcdddd",
+                        "primary-fixed": "#ffdad6",
+                        "surface-tint": "#ba1a20",
+                        "secondary-fixed": "#e2e2e2",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "on-primary-fixed": "#410003",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#4d5960",
+                        "on-secondary-container": "#5f6161",
+                        "secondary": "#5d5f5f",
+                        "on-secondary-fixed-variant": "#454747",
+                        "on-primary-container": "#fff2f0",
+                        "surface-container-low": "#f5f3f3",
+                        "tertiary-fixed-dim": "#bbc8d0",
+                        "background": "#fbf9f8",
+                        "primary": "#af101a",
+                        "on-surface": "#1b1c1c",
+                        "inverse-primary": "#ffb3ac",
+                        "inverse-surface": "#303030",
+                        "inverse-on-surface": "#f2f0f0",
+                        "on-primary-fixed-variant": "#930010",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "on-surface-variant": "#5b403d",
+                        "error": "#ba1a1a",
+                        "outline": "#8f6f6c",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#657279",
+                        "on-tertiary-fixed-variant": "#3c494f",
+                        "on-tertiary-container": "#eaf7ff",
+                        "surface-container-high": "#eae8e7",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "surface-dim": "#dcd9d9",
+                        "tertiary-fixed": "#d7e4ec"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xl": "40px",
+                        "container-max": "1440px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "base": "4px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Public Sans"],
+                        "display-lg": ["Public Sans"],
+                        "body-md": ["Public Sans"],
+                        "headline-md": ["Public Sans"],
+                        "headline-lg-mobile": ["Public Sans"],
+                        "code-md": ["JetBrains Mono"],
+                        "headline-lg": ["Public Sans"],
+                        "body-lg": ["Public Sans"],
+                        "label-md": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "code-md": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface border-b border-outline-variant w-full docked top-0 z-50">
+<div class="flex justify-between items-center px-lg py-sm w-full max-w-container-max mx-auto h-16">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">BPA Ticketing</span>
+</div>
+<nav class="hidden md:flex gap-lg">
+<a class="text-secondary hover:text-primary-container transition-colors font-title-lg text-title-lg cursor-pointer active:opacity-80" href="#">Dashboard</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-title-lg text-title-lg cursor-pointer active:opacity-80" href="#">Support</a>
+<a class="text-secondary hover:text-primary-container transition-colors font-title-lg text-title-lg cursor-pointer active:opacity-80" href="#">Knowledge Base</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="text-secondary hover:text-primary-container transition-colors cursor-pointer active:opacity-80 font-title-lg text-title-lg">Logout</button>
+<img alt="User Profile Avatar" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A small, professional user avatar portrait of a government employee in a formal setting, well-lit, corporate minimalism aesthetic, neutral background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9FkpPh_AyzT2mngmhLuL8OgZqfJJaFjprp2NDJKJ7MOJpzgKdZNarWPsyF4a1Y08fTvSjF312doVx88YpAcLgvfyMeB6sdbUJqcJi-xfCrhBJ5TGryPGk4qupTfoPg3mrRv-UPEMwMEkJCM4UiCvy16OwsgQPYZC-V_F9WQCsPc5hgA-a8J8baUoH9LqPow_gz2aqmcPtQfbImI7D0xYjIpNntvspbd0zdb5SXW-UQ_ImtFeuf6ZhB74y_8F21r5okAw4EUlxS7Bw"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex w-full max-w-container-max mx-auto h-full">
+<!-- SideNavBar (Suppressed for transactional "Submit Ticket" flow to focus on canvas, but keeping it visible as per standard layout unless deeply focused. Assuming "Support" implies a new ticket flow from Dashboard. Will hide on mobile.) -->
+<aside class="hidden md:flex flex-col h-screen w-64 bg-surface-container-low border-r border-outline-variant py-lg gap-md docked fixed-left shrink-0 z-40">
+<div class="px-md mb-md">
+<div class="flex items-center gap-sm">
+<img alt="Admin Logo" class="w-10 h-10 rounded-DEFAULT object-cover" data-alt="A minimal, flat design corporate logo for a government institutional service, predominantly dark grey with red accents, modern corporate minimalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBM-A0ZHQK02JVC2Rc10jTaf1aop_0R7T5QIZp4ZehpkX5AFqpQPItBg7dTfbjB0oBLpBvV94xlgmOpZ70DM_t-Trkn6_a2LmtAo2-ryB6qBuBjH8rLiAuxR9SlbDslK5F3n_A7QSMun6dTKPiJ6gJdVAe6el1yBBRAuuOwg3iCQ3j9_Jgwi_mU2D6NTlTQalLbBmaJBZVoJN_I7sf4F3QkqAK1nrrAtRjMj9CXnw4ynzk50woSFlQZ0EEInnGs_o1hV6knAlSpnNIr"/>
+<div>
+<h2 class="font-title-lg text-title-lg font-bold text-on-surface">BPA Admin</h2>
+<p class="font-label-md text-label-md text-secondary">System Management</p>
+</div>
+</div>
+</div>
+<button class="mx-md mb-md bg-primary text-on-primary font-label-md text-label-md py-sm px-md rounded-DEFAULT flex items-center justify-center gap-xs hover:bg-surface-tint transition-colors cursor-pointer active:scale-95 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">add</span> Create Ticket
+            </button>
+<nav class="flex-1 flex flex-col gap-xs px-sm">
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-on-secondary-container hover:bg-secondary-container/50 transition-all cursor-pointer active:scale-95 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span> Dashboard
+                </a>
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-primary font-bold border-l-4 border-primary bg-primary-container/10 transition-all cursor-pointer active:scale-95 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">confirmation_number</span> Ticket List
+                </a>
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-on-secondary-container hover:bg-secondary-container/50 transition-all cursor-pointer active:scale-95 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">category</span> Categories
+                </a>
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-on-secondary-container hover:bg-secondary-container/50 transition-all cursor-pointer active:scale-95 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span> Users
+                </a>
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-on-secondary-container hover:bg-secondary-container/50 transition-all cursor-pointer active:scale-95 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">assessment</span> Reports
+                </a>
+</nav>
+<div class="mt-auto px-sm flex flex-col gap-xs border-t border-outline-variant pt-md">
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-on-secondary-container hover:bg-secondary-container/50 transition-all cursor-pointer active:scale-95 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span> Settings
+                </a>
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-on-secondary-container hover:bg-secondary-container/50 transition-all cursor-pointer active:scale-95 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span> Help Center
+                </a>
+</div>
+</aside>
+<!-- Canvas Area -->
+<section class="flex-1 px-md md:px-xl py-xl md:ml-64 bg-surface w-full">
+<div class="max-w-4xl mx-auto">
+<!-- Page Header -->
+<div class="mb-lg">
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Kirim Tiket Baru</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Silakan isi formulir di bawah ini dengan detail masalah yang Anda hadapi. Tim kami akan segera menindaklanjutinya.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<!-- Left Column: Form -->
+<div class="lg:col-span-2 space-y-md">
+<form class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT p-lg shadow-sm space-y-lg">
+<!-- Category Dropdown -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="category">Kategori BPA <span class="text-error">*</span></label>
+<div class="relative">
+<select class="block w-full bg-surface-container-lowest border border-outline-variant rounded-DEFAULT py-sm px-md text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none cursor-pointer" id="category" name="category">
+<option disabled="" selected="" value="">Pilih Kategori Masalah</option>
+<option value="hardware">Kendala Perangkat Keras (Hardware)</option>
+<option value="software">Kendala Perangkat Lunak (Software)</option>
+<option value="network">Jaringan &amp; Internet</option>
+<option value="access">Akses Akun &amp; Kata Sandi</option>
+<option value="other">Lainnya</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-md text-secondary">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Subject Line -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="subject">Judul / Subjek <span class="text-error">*</span></label>
+<input class="block w-full bg-surface-container-lowest border border-outline-variant rounded-DEFAULT py-sm px-md text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" id="subject" name="subject" placeholder="Ringkasan singkat masalah" type="text"/>
+</div>
+<!-- Issue Description -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="description">Deskripsi Masalah <span class="text-error">*</span></label>
+<textarea class="block w-full bg-surface-container-lowest border border-outline-variant rounded-DEFAULT py-sm px-md text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-y" id="description" name="description" placeholder="Jelaskan masalah Anda secara detail. Sertakan pesan error jika ada..." rows="6"></textarea>
+</div>
+<!-- Attachment (Optional) -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs">Lampiran (Opsional)</label>
+<div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-outline-variant border-dashed rounded-DEFAULT bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer">
+<div class="space-y-1 text-center">
+<span class="material-symbols-outlined text-secondary text-[32px] mx-auto">upload_file</span>
+<div class="flex text-sm text-secondary justify-center">
+<label class="relative cursor-pointer bg-surface-container-lowest rounded-DEFAULT font-label-md text-label-md text-primary hover:text-primary-container focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary" for="file-upload">
+<span>Pilih file</span>
+<input class="sr-only" id="file-upload" name="file-upload" type="file"/>
+</label>
+<p class="pl-1 font-body-md text-body-md">atau tarik dan lepas</p>
+</div>
+<p class="text-xs text-on-surface-variant">PNG, JPG, PDF hingga 10MB</p>
+</div>
+</div>
+</div>
+<!-- Submit Action -->
+<div class="pt-md border-t border-outline-variant flex justify-end gap-sm">
+<button class="bg-transparent text-secondary border border-outline-variant font-label-md text-label-md py-sm px-lg rounded-DEFAULT hover:bg-surface-container transition-colors" type="button">Batal</button>
+<button class="bg-primary text-on-primary font-label-md text-label-md py-sm px-lg rounded-DEFAULT flex items-center gap-xs hover:bg-surface-tint transition-colors shadow-sm" type="submit">
+<span class="material-symbols-outlined text-[18px]">send</span> Kirim Tiket
+                                </button>
+</div>
+</form>
+</div>
+<!-- Right Column: Identity Summary Panel -->
+<div class="lg:col-span-1">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT p-lg shadow-sm sticky top-24">
+<h3 class="font-title-lg text-title-lg text-on-surface border-b border-outline-variant pb-sm mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">badge</span> Informasi Pengguna
+                            </h3>
+<div class="space-y-md">
+<div class="flex items-center gap-md mb-md">
+<img alt="Current User" class="w-16 h-16 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a female government employee in a light-filled modern office, corporate minimalism, neutral colors, white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEi14nPDu5Ny1DFMcY4zMf-BFUA1-ClEgVwf8dQT7gH4A9Q8IMj3PurHDlp8CNAywHabb1zUYNlxJGXnXJ14shStFEbp13VM4MOvi-_r9OwXQjPNXnqXAUDou15g5nVdHi03QaxHP5zcsX2lyprxYH_CLq-f3_XoERfTZKx0Pio7iLT1nh-HeqjXodv-oWNc9STMvQm6cUyObbWGkETB6-LYYQQNa2h2xuH8UrTt6_eCSLFb4kZuysZp_pEWaKdi63TocDE66UlKFI"/>
+<div>
+<p class="font-title-lg text-title-lg text-on-surface">Dr. Sarah Jenkins</p>
+<p class="font-label-md text-label-md text-primary">ID: BPA-99281</p>
+</div>
+</div>
+<div class="space-y-sm">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">Departemen</p>
+<p class="font-body-md text-body-md text-on-surface">Layanan Kelembagaan</p>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">Email</p>
+<p class="font-body-md text-body-md text-on-surface">s.jenkins@bpa.gov</p>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">Telepon</p>
+<p class="font-body-md text-body-md text-on-surface">+62 811-0000-1234</p>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">Lokasi</p>
+<p class="font-body-md text-body-md text-on-surface">Gedung Utama, Lantai 4</p>
+</div>
+</div>
+<div class="mt-lg pt-md border-t border-outline-variant bg-surface-container-low p-sm rounded-DEFAULT">
+<div class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">info</span>
+<p class="font-body-md text-body-md text-xs text-on-surface-variant">Pastikan data di atas sesuai. Jika ada ketidaksesuaian, harap perbarui profil Anda sebelum mengirim tiket.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest border-t border-outline-variant relative w-full mt-auto z-40 md:pl-64">
+<div class="flex flex-col md:flex-row justify-between items-center px-lg py-md w-full max-w-container-max mx-auto">
+<div class="text-on-surface-variant font-body-md text-body-md mb-md md:mb-0">
+                © 2024 BPA Institutional Services. All rights reserved.
+            </div>
+<nav class="flex gap-lg">
+<a class="text-on-surface-variant hover:text-primary underline transition-colors cursor-pointer font-body-md text-body-md" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary underline transition-colors cursor-pointer font-body-md text-body-md" href="#">Terms of Service</a>
+<a class="text-primary underline hover:text-primary transition-colors cursor-pointer font-body-md text-body-md" href="#">Contact Support</a>
+</nav>
+</div>
+</footer>
+</body></html>

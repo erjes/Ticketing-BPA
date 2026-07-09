@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ticket Status</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-background": "#1b1c1c",
+                      "surface": "#fbf9f8",
+                      "surface-bright": "#fbf9f8",
+                      "on-tertiary-fixed": "#111d23",
+                      "surface-container": "#f0eded",
+                      "primary-container": "#d32f2f",
+                      "error-container": "#ffdad6",
+                      "on-error": "#ffffff",
+                      "surface-variant": "#e4e2e1",
+                      "outline-variant": "#e4beba",
+                      "on-primary": "#ffffff",
+                      "surface-container-highest": "#e4e2e1",
+                      "on-error-container": "#93000a",
+                      "secondary-container": "#dcdddd",
+                      "primary-fixed": "#ffdad6",
+                      "surface-tint": "#ba1a20",
+                      "secondary-fixed": "#e2e2e2",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed": "#1a1c1c",
+                      "on-primary-fixed": "#410003",
+                      "on-secondary": "#ffffff",
+                      "tertiary": "#4d5960",
+                      "on-secondary-container": "#5f6161",
+                      "secondary": "#5d5f5f",
+                      "on-secondary-fixed-variant": "#454747",
+                      "on-primary-container": "#fff2f0",
+                      "surface-container-low": "#f5f3f3",
+                      "tertiary-fixed-dim": "#bbc8d0",
+                      "background": "#fbf9f8",
+                      "primary": "#af101a",
+                      "on-surface": "#1b1c1c",
+                      "inverse-primary": "#ffb3ac",
+                      "inverse-surface": "#303030",
+                      "inverse-on-surface": "#f2f0f0",
+                      "on-primary-fixed-variant": "#930010",
+                      "primary-fixed-dim": "#ffb3ac",
+                      "on-surface-variant": "#5b403d",
+                      "error": "#ba1a1a",
+                      "outline": "#8f6f6c",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-container": "#657279",
+                      "on-tertiary-fixed-variant": "#3c494f",
+                      "on-tertiary-container": "#eaf7ff",
+                      "surface-container-high": "#eae8e7",
+                      "secondary-fixed-dim": "#c6c6c7",
+                      "surface-dim": "#dcd9d9",
+                      "tertiary-fixed": "#d7e4ec"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xl": "40px",
+                      "container-max": "1440px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "base": "4px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "title-lg": [
+                              "Public Sans"
+                      ],
+                      "display-lg": [
+                              "Public Sans"
+                      ],
+                      "body-md": [
+                              "Public Sans"
+                      ],
+                      "headline-md": [
+                              "Public Sans"
+                      ],
+                      "headline-lg-mobile": [
+                              "Public Sans"
+                      ],
+                      "code-md": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg": [
+                              "Public Sans"
+                      ],
+                      "body-lg": [
+                              "Public Sans"
+                      ],
+                      "label-md": [
+                              "Public Sans"
+                      ]
+              },
+              "fontSize": {
+                      "title-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "code-md": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body { background-color: #F5F5F5; }
+    </style>
+</head>
+<body class="text-on-background font-body-md bg-background min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-surface border-b border-outline-variant docked full-width top-0 z-50">
+<div class="flex justify-between items-center px-lg py-sm w-full max-w-container-max mx-auto h-16">
+<div class="font-headline-md text-headline-md font-bold text-primary">BPA Ticketing</div>
+<div class="hidden md:flex gap-lg">
+<a class="text-secondary hover:text-primary-container transition-colors cursor-pointer active:opacity-80 font-title-lg text-title-lg" href="#">Dashboard</a>
+<a class="text-primary border-b-2 border-primary pb-1 hover:text-primary-container transition-colors cursor-pointer active:opacity-80 font-title-lg text-title-lg" href="#">Support</a>
+<a class="text-secondary hover:text-primary-container transition-colors cursor-pointer active:opacity-80 font-title-lg text-title-lg" href="#">Knowledge Base</a>
+</div>
+<div class="flex items-center gap-md">
+<button class="font-label-md text-label-md text-primary hover:text-primary-container transition-colors">Logout</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" data-icon="person">person</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-lg py-xl">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Ticket Status Overview (Left Column) -->
+<div class="md:col-span-8 flex flex-col gap-lg">
+<!-- Success Banner -->
+<div class="bg-[#E8F5E9] border border-[#A5D6A7] p-md rounded flex items-start gap-md">
+<span class="material-symbols-outlined text-[#2E7D32]" data-icon="check_circle">check_circle</span>
+<div>
+<h3 class="font-title-lg text-title-lg text-[#1B5E20]">Ticket Submitted Successfully</h3>
+<p class="font-body-md text-body-md text-[#2E7D32] mt-xs">Your request has been received and is currently being processed by our team.</p>
+</div>
+</div>
+<!-- Ticket Header Card -->
+<div class="bg-white border border-outline-variant p-lg rounded flex flex-col gap-md relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-[4px] bg-primary"></div>
+<div class="flex justify-between items-start pl-sm">
+<div>
+<div class="font-label-md text-label-md text-secondary uppercase tracking-wider mb-xs">Ticket ID</div>
+<h1 class="font-display-lg text-display-lg text-on-surface">#REQ-84729</h1>
+</div>
+<div class="bg-[#E3F2FD] text-[#0D47A1] font-label-md text-label-md px-md py-xs rounded">Open</div>
+</div>
+<div class="pl-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-xs">Access Request for Financial Systems</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Requesting elevated access to the Q3 budget reporting modules to finalize the quarterly review documents.</p>
+</div>
+<div class="flex flex-wrap gap-lg pl-sm mt-md border-t border-surface-variant pt-md">
+<div>
+<span class="font-label-md text-label-md text-secondary block mb-xs">Category</span>
+<span class="font-body-md text-body-md text-on-surface">System Access</span>
+</div>
+<div>
+<span class="font-label-md text-label-md text-secondary block mb-xs">Priority</span>
+<span class="font-body-md text-body-md text-on-surface flex items-center gap-xs"><span class="w-2 h-2 rounded-full bg-primary inline-block"></span> High</span>
+</div>
+<div>
+<span class="font-label-md text-label-md text-secondary block mb-xs">Submitted On</span>
+<span class="font-body-md text-body-md text-on-surface">Oct 24, 2024, 09:15 AM</span>
+</div>
+</div>
+</div>
+<!-- Interactive Timeline -->
+<div class="bg-white border border-outline-variant p-lg rounded">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-lg border-b border-surface-variant pb-sm">Status Timeline</h3>
+<div class="relative border-l-2 border-surface-variant ml-md space-y-lg">
+<!-- Timeline Item 1 -->
+<div class="relative pl-lg">
+<div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-primary border-2 border-white"></div>
+<div class="font-label-md text-label-md text-secondary mb-xs">Today, 09:15 AM</div>
+<div class="bg-surface p-md rounded border border-surface-variant">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-xs">Ticket Created</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Your request was successfully logged in the system.</p>
+</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative pl-lg">
+<div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-surface-variant border-2 border-white"></div>
+<div class="font-label-md text-label-md text-secondary mb-xs">Pending</div>
+<div class="bg-surface p-md rounded border border-surface-variant opacity-60">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-xs">Admin Assignment</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Waiting for an administrator to be assigned to this request.</p>
+</div>
+</div>
+</div>
+<!-- Add Comment -->
+<div class="mt-xl pt-lg border-t border-surface-variant">
+<label class="font-label-md text-label-md text-on-surface block mb-sm">Add Additional Information</label>
+<textarea class="w-full border border-surface-variant rounded p-sm font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none min-h-[100px] mb-md" placeholder="Provide more details if needed..."></textarea>
+<div class="flex justify-end">
+<button class="bg-primary text-white font-label-md text-label-md py-sm px-lg rounded hover:bg-on-primary-fixed-variant transition-colors">Submit Update</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Context/Info (Right Column) -->
+<div class="md:col-span-4 flex flex-col gap-lg">
+<!-- Support Info Card -->
+<div class="bg-white border border-outline-variant p-lg rounded flex flex-col gap-md">
+<h3 class="font-title-lg text-title-lg text-on-surface border-b border-surface-variant pb-sm">Support Details</h3>
+<div>
+<span class="font-label-md text-label-md text-secondary block mb-xs">Expected Resolution</span>
+<span class="font-body-md text-body-md text-on-surface">Within 24 Hours</span>
+</div>
+<div>
+<span class="font-label-md text-label-md text-secondary block mb-xs">Department</span>
+<span class="font-body-md text-body-md text-on-surface">IT Operations</span>
+</div>
+<div class="bg-surface-container-low p-md rounded mt-sm">
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">If this issue becomes critical, please reference your Ticket ID <strong>#REQ-84729</strong> when calling the support hotline at ext. 5555.</p>
+</div>
+</div>
+<!-- Attachments Card -->
+<div class="bg-white border border-outline-variant p-lg rounded flex flex-col gap-md">
+<h3 class="font-title-lg text-title-lg text-on-surface border-b border-surface-variant pb-sm flex justify-between items-center">
+                        Attachments
+                        <span class="material-symbols-outlined text-secondary" data-icon="attach_file">attach_file</span>
+</h3>
+<ul class="space-y-sm">
+<li class="flex items-center gap-sm p-sm hover:bg-surface rounded transition-colors cursor-pointer border border-transparent hover:border-surface-variant">
+<span class="material-symbols-outlined text-primary" data-icon="picture_as_pdf">picture_as_pdf</span>
+<div class="flex-grow">
+<div class="font-body-md text-body-md text-on-surface">approval_form.pdf</div>
+<div class="font-label-md text-label-md text-secondary">2.4 MB</div>
+</div>
+<span class="material-symbols-outlined text-secondary hover:text-primary" data-icon="download">download</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest border-t border-outline-variant relative w-full mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-lg py-md w-full max-w-container-max mx-auto">
+<div class="font-label-md text-label-md font-semibold text-primary">BPA Institutional Services</div>
+<div class="font-body-md text-body-md text-on-surface-variant mt-sm md:mt-0">© 2024 BPA Institutional Services. All rights reserved.</div>
+<div class="flex gap-md mt-sm md:mt-0">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary underline transition-colors cursor-pointer" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary underline transition-colors cursor-pointer" href="#">Terms of Service</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary underline transition-colors cursor-pointer" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,34 +1,11 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Award, Briefcase, GraduationCap, Handshake, Search } from 'lucide-react';
+import { Folder, Search } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-const CATEGORIES_CONFIG = [
-    {
-        name: 'Data Sertifikasi Dosen',
-        description: 'Pengajuan dan verifikasi sertifikasi dosen BPA.',
-        icon: Award,
-    },
-    {
-        name: 'Data Mahasiswa',
-        description: 'Kelola data akademik dan status mahasiswa.',
-        icon: GraduationCap,
-    },
-    {
-        name: 'Program Magang Berdampak',
-        description: 'Layanan magang industri dan program berdampak.',
-        icon: Briefcase,
-    },
-    {
-        name: 'Data Kerjasama',
-        description: 'Administrasi dan dokumen kerjasama institusi.',
-        icon: Handshake,
-    },
-];
-
-export default function Dashboard({ stats, categoryCounts, searchResults, filters }: { stats: any, categoryCounts: Record<string, number>, searchResults: any[] | null, filters: { search: string } }) {
+export default function Dashboard({ stats, categories, searchResults, filters }: { stats: any, categories: any[], searchResults: any[] | null, filters: { search: string } }) {
     const { auth } = usePage().props as any;
     const [search, setSearch] = useState(filters.search || '');
 
@@ -87,7 +64,7 @@ export default function Dashboard({ stats, categoryCounts, searchResults, filter
                     </Card>
                     <Card className="bg-card border rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center text-center">
                         <div className="text-4xl font-extrabold text-rose-600 mb-2">
-                            4
+                            {categories.length}
                         </div>
                         <div className="text-sm font-semibold text-muted-foreground">
                             Kategori Tiket
@@ -189,9 +166,8 @@ export default function Dashboard({ stats, categoryCounts, searchResults, filter
                 <div className="mt-4">
                     <h2 className="text-xl font-bold mb-6">Kategori Tiket</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {CATEGORIES_CONFIG.map((category) => {
-                            const IconComponent = category.icon;
-                            const count = categoryCounts[category.name] ?? 0;
+                        {categories.map((category) => {
+                            const count = category.count ?? 0;
 
                             return (
                                 <Link
@@ -201,14 +177,14 @@ export default function Dashboard({ stats, categoryCounts, searchResults, filter
                                 >
                                     <div className="flex flex-col gap-4">
                                         <div className="bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 p-3 rounded-xl w-12 h-12 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                                            <IconComponent className="w-6 h-6" />
+                                            <Folder className="w-6 h-6" />
                                         </div>
                                         <div>
                                             <h3 className="font-bold text-lg text-foreground group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
                                                 {category.name}
                                             </h3>
                                             <p className="text-sm text-muted-foreground mt-2 line-clamp-3">
-                                                {category.description}
+                                                {category.description || 'Tidak ada deskripsi.'}
                                             </p>
                                         </div>
                                     </div>

@@ -21,10 +21,12 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:ticket_categories,name',
+            'description' => 'nullable|string',
         ]);
 
         TicketCategory::create([
             'name' => $request->name,
+            'description' => $request->description,
         ]);
 
         return back()->with('success', 'Kategori berhasil ditambahkan.');
@@ -34,10 +36,12 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:ticket_categories,name,' . $category->id,
+            'description' => 'nullable|string',
         ]);
 
         $category->update([
             'name' => $request->name,
+            'description' => $request->description,
         ]);
 
         return back()->with('success', 'Kategori berhasil diperbarui.');

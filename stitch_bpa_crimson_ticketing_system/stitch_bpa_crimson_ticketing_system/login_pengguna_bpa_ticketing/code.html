@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login - BPA Ticketing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-background": "#1b1c1c",
+                    "surface": "#fbf9f8",
+                    "surface-bright": "#fbf9f8",
+                    "on-tertiary-fixed": "#111d23",
+                    "surface-container": "#f0eded",
+                    "primary-container": "#d32f2f",
+                    "error-container": "#ffdad6",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#e4e2e1",
+                    "outline-variant": "#e4beba",
+                    "on-primary": "#ffffff",
+                    "surface-container-highest": "#e4e2e1",
+                    "on-error-container": "#93000a",
+                    "secondary-container": "#dcdddd",
+                    "primary-fixed": "#ffdad6",
+                    "surface-tint": "#ba1a20",
+                    "secondary-fixed": "#e2e2e2",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "on-primary-fixed": "#410003",
+                    "on-secondary": "#ffffff",
+                    "tertiary": "#4d5960",
+                    "on-secondary-container": "#5f6161",
+                    "secondary": "#5d5f5f",
+                    "on-secondary-fixed-variant": "#454747",
+                    "on-primary-container": "#fff2f0",
+                    "surface-container-low": "#f5f3f3",
+                    "tertiary-fixed-dim": "#bbc8d0",
+                    "background": "#fbf9f8",
+                    "primary": "#af101a",
+                    "on-surface": "#1b1c1c",
+                    "inverse-primary": "#ffb3ac",
+                    "inverse-surface": "#303030",
+                    "inverse-on-surface": "#f2f0f0",
+                    "on-primary-fixed-variant": "#930010",
+                    "primary-fixed-dim": "#ffb3ac",
+                    "on-surface-variant": "#5b403d",
+                    "error": "#ba1a1a",
+                    "outline": "#8f6f6c",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#657279",
+                    "on-tertiary-fixed-variant": "#3c494f",
+                    "on-tertiary-container": "#eaf7ff",
+                    "surface-container-high": "#eae8e7",
+                    "secondary-fixed-dim": "#c6c6c7",
+                    "surface-dim": "#dcd9d9",
+                    "tertiary-fixed": "#d7e4ec"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xl": "40px",
+                    "container-max": "1440px",
+                    "sm": "8px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "base": "4px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "title-lg": [
+                            "Public Sans"
+                    ],
+                    "display-lg": [
+                            "Public Sans"
+                    ],
+                    "body-md": [
+                            "Public Sans"
+                    ],
+                    "headline-md": [
+                            "Public Sans"
+                    ],
+                    "headline-lg-mobile": [
+                            "Public Sans"
+                    ],
+                    "code-md": [
+                            "JetBrains Mono"
+                    ],
+                    "headline-lg": [
+                            "Public Sans"
+                    ],
+                    "body-lg": [
+                            "Public Sans"
+                    ],
+                    "label-md": [
+                            "Public Sans"
+                    ]
+            },
+            "fontSize": {
+                    "title-lg": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "56px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "code-md": [
+                            "13px",
+                            {
+                                    "lineHeight": "18px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-md": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen w-screen overflow-hidden flex flex-col md:flex-row">
+<!-- Left Side: Login Form Canvas -->
+<main class="w-full md:w-1/2 lg:w-5/12 xl:w-1/3 h-full flex flex-col justify-center px-lg py-xl bg-surface-container-lowest border-r border-outline-variant z-10 relative">
+<div class="max-w-md w-full mx-auto">
+<!-- Brand Logo Area -->
+<div class="mb-lg">
+<h1 class="font-headline-lg text-headline-lg text-primary mb-xs">BPA Ticketing</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Portal Layanan Terpadu</p>
+</div>
+<!-- Header -->
+<div class="mb-lg">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-xs">Masuk ke Akun Anda</h2>
+<p class="font-body-md text-body-md text-secondary">Silakan masuk menggunakan akun Google institusi Anda untuk akses tercepat.</p>
+</div>
+<!-- Primary Action: Google Login -->
+<button class="w-full flex items-center justify-center gap-sm bg-primary-container text-on-primary font-label-md text-label-md py-sm px-md rounded hover:bg-primary transition-colors mb-lg shadow-sm">
+<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+<span class="text-on-primary">Lanjut dengan Google</span>
+</button>
+<!-- Divider -->
+<div class="flex items-center gap-sm mb-lg">
+<div class="flex-1 h-px bg-outline-variant"></div>
+<span class="font-label-md text-label-md text-secondary">ATAU GUNAKAN EMAIL</span>
+<div class="flex-1 h-px bg-outline-variant"></div>
+</div>
+<!-- Secondary Action: Email Form -->
+<form class="flex flex-col gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="email">Email Institusi</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">mail</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded py-sm pl-[36px] pr-sm font-body-md text-body-md text-on-surface focus:border-primary-container focus:ring-2 focus:ring-primary-container/10 outline-none transition-all" id="email" placeholder="nama@bpa.go.id" type="email"/>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface" for="password">Kata Sandi</label>
+<a class="font-label-md text-label-md text-primary hover:underline" href="#">Lupa sandi?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">lock</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded py-sm pl-[36px] pr-sm font-body-md text-body-md text-on-surface focus:border-primary-container focus:ring-2 focus:ring-primary-container/10 outline-none transition-all" id="password" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<div class="flex items-center gap-sm mt-xs">
+<input class="w-4 h-4 border-outline-variant rounded text-primary-container focus:ring-primary-container/20 cursor-pointer" id="remember" type="checkbox"/>
+<label class="font-body-md text-body-md text-on-surface-variant cursor-pointer" for="remember">Ingat saya di perangkat ini</label>
+</div>
+<button class="w-full bg-transparent border border-outline text-on-surface font-label-md text-label-md py-sm px-md rounded hover:bg-surface-container-low transition-colors mt-sm" type="button">
+                    Masuk
+                </button>
+</form>
+<!-- Support Footer -->
+<div class="mt-xl text-center">
+<p class="font-body-md text-body-md text-secondary">Butuh bantuan akses? <a class="text-primary hover:underline" href="#">Hubungi Tim IT Support</a></p>
+</div>
+</div>
+</main>
+<!-- Right Side: Informational Context Panel (Hidden on Mobile) -->
+<aside class="hidden md:flex flex-1 bg-surface-container flex-col relative overflow-hidden">
+<!-- Abstract Aesthetic Background Image -->
+<div class="absolute inset-0 z-0">
+<div class="w-full h-full bg-cover bg-center opacity-60" data-alt="A modern, abstract architectural composition featuring clean, minimalist concrete structures and soft natural light. The lighting is bright and airy, creating a professional, light-mode aesthetic. A subtle, transparent red geometric shape overlays a portion of the structure, echoing corporate branding. The mood is calm, organized, and institutional, conveying reliability and order." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBNNF7q2iX1yF49GQo5uVFfKXvHtbagWGyKRu0CHH-AKkyEu6H_FZWZHYa71btM6cxrWtWaL_hE9MHs5UakzL4GsliEtaFUzsin5xQPX8Dd3gUpTqoLOxbu94W253L8cbvDs6s12kYw3yCAvwMnkksiYMkgdjCpxNjOf1KnUVOLFUiXZZ9sUHSwqTyXn__grepgzKsW13XYjChXWDcjeB4BEiQKfammU7L2VrSmOr0slXHNuqBP8i_uE0SZ1wnzyRdU113OjnXXDaBE')"></div>
+<!-- Gradient Overlay for readability -->
+<div class="absolute inset-0 bg-gradient-to-br from-surface/90 via-surface/70 to-transparent"></div>
+</div>
+<!-- Content Canvas -->
+<div class="relative z-10 flex flex-col justify-center h-full p-xl max-w-2xl">
+<div class="bg-surface-container-lowest/80 backdrop-blur-md border border-outline-variant rounded-lg p-lg shadow-sm">
+<div class="flex items-center gap-md mb-md">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[24px]">confirmation_number</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Pusat Bantuan BPA</h3>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-md leading-relaxed">
+                    Sistem tiket terpadu untuk mengelola, melacak, dan menyelesaikan permintaan dukungan teknis, administratif, dan operasional di lingkungan BPA.
+                </p>
+<ul class="flex flex-col gap-sm">
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary text-[20px] mt-xs">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Pelacakan status tiket secara real-time.</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary text-[20px] mt-xs">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Integrasi basis pengetahuan (Knowledge Base).</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary text-[20px] mt-xs">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Notifikasi pembaruan otomatis via email.</span>
+</li>
+</ul>
+</div>
+<!-- Contextual Badges -->
+<div class="flex gap-sm mt-lg flex-wrap">
+<span class="px-sm py-xs bg-surface-container-lowest border border-outline-variant rounded text-on-surface font-label-md text-label-md flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span> Sistem Online
+                 </span>
+<span class="px-sm py-xs bg-surface-container-lowest border border-outline-variant rounded text-on-surface font-label-md text-label-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">shield</span> Keamanan Terenkripsi
+                 </span>
+</div>
+</div>
+<!-- Subtle Branding Watermark -->
+<div class="absolute bottom-lg right-lg z-10 opacity-30 select-none pointer-events-none">
+<span class="font-display-lg text-display-lg text-primary tracking-tighter">BPA</span>
+</div>
+</aside>
+</body></html>
