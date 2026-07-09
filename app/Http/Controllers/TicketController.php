@@ -11,7 +11,10 @@ class TicketController extends Controller
 {
     public function index(Request $request)
     {
-        return Inertia::render('Dashboard');
+        $categories = \App\Models\TicketCategory::orderBy('name')->pluck('name');
+        return Inertia::render('Dashboard', [
+            'categories' => $categories
+        ]);
     }
 
     public function tickets(Request $request)
@@ -24,27 +27,47 @@ class TicketController extends Controller
 
     public function create()
     {
-        return Inertia::render('Tickets/Create');
+        $categories = \App\Models\TicketCategory::orderBy('name')->pluck('name');
+        return Inertia::render('Tickets/Create', [
+            'categories' => $categories
+        ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'category' => 'required|string',
+            'subject' => 'required|string|max:255',
             'description' => 'required|string',
+            'attachments.*' => 'nullable|file|mimes:jpg,gif,jpeg,png,pdf,doc,docx,zip|max:2048000', // max 2GB
         ]);
 
         $ticket = DB::transaction(function () use ($request) {
             $maxId = Ticket::lockForUpdate()->max('id') ?? 0;
             $ticketNumber = 'BPA-' . date('Y') . '-' . str_pad($maxId + 1, 3, '0', STR_PAD_LEFT);
 
-            return Ticket::create([
+            $ticket = Ticket::create([
                 'ticket_number' => $ticketNumber,
                 'user_id' => $request->user()->id,
                 'category' => $request->category,
+                'subject' => $request->subject,
                 'description' => $request->description,
                 'status' => 'Open',
             ]);
+
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    $path = $file->store('attachments', 'public');
+                    $ticket->attachments()->create([
+                        'file_path' => $path,
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_type' => $file->getClientMimeType(),
+                        'file_size' => $file->getSize(),
+                    ]);
+                }
+            }
+
+            return $ticket;
         });
 
         \App\Models\ActivityLog::create([

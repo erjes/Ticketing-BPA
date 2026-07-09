@@ -9,8 +9,9 @@ import { Label } from '@/components/ui/label';
 import { dashboard } from '@/routes/admin';
 import { status, reply, update, destroy } from '@/routes/admin/tickets';
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 
-export default function Show({ ticket }: { ticket: any }) {
+export default function Show({ ticket, categories }: { ticket: any, categories: string[] }) {
     const { auth } = usePage().props as any;
     
     const { data: statusData, setData: setStatusData, post: postStatus, processing: processingStatus } = useForm({
@@ -101,10 +102,9 @@ export default function Show({ ticket }: { ticket: any }) {
                                                 <SelectValue placeholder="Pilih kategori" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="Data Sertifikasi Dosen">Data Sertifikasi Dosen</SelectItem>
-                                                <SelectItem value="Data Mahasiswa">Data Mahasiswa</SelectItem>
-                                                <SelectItem value="Program Magang Berdampak">Program Magang Berdampak</SelectItem>
-                                                <SelectItem value="Data Kerjasama">Data Kerjasama</SelectItem>
+                                                {categories && categories.map(c => (
+                                                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
                                     </div>
@@ -137,10 +137,30 @@ export default function Show({ ticket }: { ticket: any }) {
                             </CardHeader>
                             <CardContent className="flex flex-col gap-2">
                                 <p><span className="text-muted-foreground">Kategori:</span> {ticket.category}</p>
+                                <p><span className="text-muted-foreground">Subject:</span> <span className="font-semibold">{ticket.subject}</span></p>
                                 <p><span className="text-muted-foreground">Dibuat:</span> {new Date(ticket.created_at).toLocaleString()}</p>
-                                <div className="mt-4 p-4 bg-muted rounded-md whitespace-pre-wrap text-base">
-                                    {ticket.description}
+                                <div className="mt-4 p-4 bg-muted rounded-md text-base prose prose-sm max-w-none">
+                                    <ReactMarkdown>{ticket.description}</ReactMarkdown>
                                 </div>
+                                {ticket.attachments && ticket.attachments.length > 0 && (
+                                    <div className="mt-4 border-t pt-4">
+                                        <h4 className="text-sm font-semibold mb-2">Lampiran:</h4>
+                                        <div className="flex flex-wrap gap-2">
+                                            {ticket.attachments.map((file: any) => (
+                                                <a 
+                                                    key={file.id} 
+                                                    href={`/storage/${file.file_path}`} 
+                                                    target="_blank" 
+                                                    rel="noreferrer"
+                                                    className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded px-3 py-2 text-sm text-blue-600 transition-colors"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                                                    {file.file_name}
+                                                </a>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
 
@@ -159,8 +179,8 @@ export default function Show({ ticket }: { ticket: any }) {
                                                 </span>
                                                 <span>{new Date(reply.created_at).toLocaleString()}</span>
                                             </div>
-                                            <div className="whitespace-pre-wrap mt-2">
-                                                {reply.message}
+                                            <div className="mt-2 prose prose-sm max-w-none">
+                                                <ReactMarkdown>{reply.message}</ReactMarkdown>
                                             </div>
                                         </CardContent>
                                     </Card>

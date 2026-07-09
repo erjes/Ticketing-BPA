@@ -8,9 +8,24 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['ticket_number', 'user_id', 'category', 'description', 'status', 'admin_id'])]
+#[Fillable(['ticket_number', 'user_id', 'category', 'subject', 'description', 'status', 'admin_id'])]
 class Ticket extends Model
 {
+    protected $fillable = [
+        'ticket_number',
+        'user_id',
+        'category',
+        'subject',
+        'description',
+        'status',
+        'admin_id',
+    ];
+
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(TicketAttachment::class);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

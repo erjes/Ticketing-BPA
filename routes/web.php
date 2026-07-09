@@ -33,6 +33,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('tickets/{ticket:ticket_number}/reply', [\App\Http\Controllers\Admin\TicketController::class, 'reply'])->name('tickets.reply');
         
         Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+        
+        Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->except(['create', 'show', 'edit']);
     });
 
     // Super Admin Routes

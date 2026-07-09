@@ -36,9 +36,12 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
-        $ticket->load(['user', 'replies.user', 'admin']);
+        $ticket->load(['user', 'replies.user', 'admin', 'attachments']);
+        $categories = \App\Models\TicketCategory::orderBy('name')->pluck('name');
+
         return Inertia::render('Admin/Tickets/Show', [
-            'ticket' => $ticket
+            'ticket' => $ticket,
+            'categories' => $categories
         ]);
     }
 

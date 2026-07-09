@@ -14,11 +14,19 @@ export default function SuperAdminDashboard({ users }: { users: any[] }) {
         const { data, setData, post, processing } = useForm({
             role: user.role,
         });
+        const { delete: destroyUser, processing: processingDelete } = useForm();
 
         const updateRole = (e: React.FormEvent) => {
             e.preventDefault();
             post(role({ user: user.id }).url, { preserveScroll: true });
         };
+
+        const handleDelete = () => {
+            if (confirm(`Apakah Anda yakin ingin menghapus user ${user.name}? Tindakan ini tidak dapat dibatalkan.`)) {
+                // @ts-ignore
+                destroyUser(`/super-admin/users/${user.id}`, { preserveScroll: true });
+            }
+        }
 
         return (
             <tr className="hover:bg-muted/50 transition-colors">
@@ -26,21 +34,31 @@ export default function SuperAdminDashboard({ users }: { users: any[] }) {
                 <td className="px-4 py-3">{user.email}</td>
                 <td className="px-4 py-3">{user.nim_nip || '-'}</td>
                 <td className="px-4 py-3">
-                    <form onSubmit={updateRole} className="flex gap-2 items-center">
-                        <Select value={data.role} onValueChange={(v) => setData('role', v)}>
-                            <SelectTrigger className="w-[150px]">
-                                <SelectValue placeholder="Role" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="user">User</SelectItem>
-                                <SelectItem value="admin">Admin</SelectItem>
-                                <SelectItem value="super_admin">Super Admin</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Button type="submit" variant="outline" size="sm" disabled={processing || data.role === user.role}>
-                            Simpan
+                    <div className="flex gap-2 items-center">
+                        <form onSubmit={updateRole} className="flex gap-2 items-center">
+                            <Select value={data.role} onValueChange={(v) => setData('role', v)}>
+                                <SelectTrigger className="w-[150px]">
+                                    <SelectValue placeholder="Role" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="user">User</SelectItem>
+                                    <SelectItem value="admin">Admin</SelectItem>
+                                    <SelectItem value="super_admin">Super Admin</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Button type="submit" variant="outline" size="sm" disabled={processing || data.role === user.role}>
+                                Simpan
+                            </Button>
+                        </form>
+                        <Button 
+                            variant="destructive" 
+                            size="sm" 
+                            disabled={processingDelete || auth.user.id === user.id} 
+                            onClick={handleDelete}
+                        >
+                            Hapus
                         </Button>
-                    </form>
+                    </div>
                 </td>
             </tr>
         );

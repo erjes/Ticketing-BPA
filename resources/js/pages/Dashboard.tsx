@@ -3,14 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { create, show } from '@/routes/tickets';
 
-const categories = [
-    'Data Sertifikasi Dosen',
-    'Data Mahasiswa',
-    'Program Magang Berdampak',
-    'Data Kerjasama'
-];
-
-export default function Dashboard({ tickets }: { tickets: any[] }) {
+export default function Dashboard({ categories }: { categories: string[] }) {
     const { auth } = usePage().props as any;
 
     return (
@@ -41,40 +34,6 @@ export default function Dashboard({ tickets }: { tickets: any[] }) {
                             </CardContent>
                         </Card>
                     ))}
-                </div>
-
-                <div className="mt-8">
-                    <h2 className="text-xl font-bold mb-4">Riwayat Ticket Anda</h2>
-                    {tickets && tickets.length > 0 ? (
-                        <div className="flex flex-col gap-3">
-                            {tickets.map((ticket: any) => (
-                                <Card key={ticket.id}>
-                                    <div className="flex items-center justify-between p-4">
-                                        <div>
-                                            <p className="font-semibold text-lg">{ticket.ticket_number}</p>
-                                            <p className="text-sm text-muted-foreground">{ticket.category} &middot; {new Date(ticket.created_at).toLocaleDateString()}</p>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                                                ticket.status === 'Open' ? 'bg-green-100 text-green-800' :
-                                                ticket.status === 'In Progress' ? 'bg-orange-100 text-orange-800' :
-                                                'bg-gray-100 text-gray-800'
-                                            }`}>
-                                                {ticket.status}
-                                            </span>
-                                            <Link href={show({ ticket: ticket.ticket_number }).url}>
-                                                <Button variant="ghost" size="sm">Lihat riwayat →</Button>
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </Card>
-                            ))}
-                        </div>
-                    ) : (
-                        <Card className="p-8 text-center text-muted-foreground">
-                            Belum ada ticket yang dibuat.
-                        </Card>
-                    )}
                 </div>
             </div>
         </>

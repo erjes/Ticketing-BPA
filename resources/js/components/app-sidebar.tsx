@@ -55,6 +55,11 @@ export function AppSidebar() {
             href: '/admin/activity-logs',
             icon: BookOpen,
         });
+        mainNavItems.push({
+            title: 'Kategori Tiket',
+            href: '/admin/categories',
+            icon: LayoutGrid,
+        });
     } else {
         defaultDashboardUrl = userDashboard().url;
         mainNavItems.push({
