@@ -11,8 +11,13 @@ class TicketController extends Controller
 {
     public function index(Request $request)
     {
+        return Inertia::render('Dashboard');
+    }
+
+    public function tickets(Request $request)
+    {
         $tickets = Ticket::where('user_id', $request->user()->id)->latest()->get();
-        return Inertia::render('Dashboard', [
+        return Inertia::render('Tickets/Index', [
             'tickets' => $tickets
         ]);
     }
@@ -41,6 +46,14 @@ class TicketController extends Controller
                 'status' => 'Open',
             ]);
         });
+
+        \App\Models\ActivityLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'create_ticket',
+            'description' => 'User membuat tiket baru',
+            'model_type' => Ticket::class,
+            'model_id' => $ticket->id,
+        ]);
 
         return redirect()->route('tickets.show', $ticket->ticket_number);
     }
@@ -74,6 +87,14 @@ class TicketController extends Controller
             'user_id' => $request->user()->id,
             'message' => $request->message,
             'is_internal' => false,
+        ]);
+
+        \App\Models\ActivityLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'reply_ticket',
+            'description' => 'User membalas tiket',
+            'model_type' => Ticket::class,
+            'model_id' => $ticket->id,
         ]);
 
         return back();

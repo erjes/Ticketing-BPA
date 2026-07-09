@@ -3,8 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { dashboard } from '@/routes/admin';
-import { status, reply } from '@/routes/admin/tickets';
+import { status, reply, update, destroy } from '@/routes/admin/tickets';
+import { useState } from 'react';
 
 export default function Show({ ticket }: { ticket: any }) {
     const { auth } = usePage().props as any;
@@ -18,6 +22,14 @@ export default function Show({ ticket }: { ticket: any }) {
         is_internal: false,
     });
 
+    const { data: editData, setData: setEditData, put: putEdit, processing: processingEdit } = useForm({
+        category: ticket.category,
+        message: ticket.description,
+    });
+
+    const { delete: destroyTicket, processing: processingDestroy } = useForm();
+    const [editOpen, setEditOpen] = useState(false);
+
     const updateStatus = (e: React.FormEvent) => {
         e.preventDefault();
         postStatus(status({ ticket: ticket.ticket_number }).url);
@@ -28,6 +40,19 @@ export default function Show({ ticket }: { ticket: any }) {
         postReply(reply({ ticket: ticket.ticket_number }).url, {
             onSuccess: () => resetReply('message'),
         });
+    };
+
+    const submitEdit = (e: React.FormEvent) => {
+        e.preventDefault();
+        putEdit(update({ ticket: ticket.ticket_number }).url, {
+            onSuccess: () => setEditOpen(false),
+        });
+    };
+
+    const handleDelete = () => {
+        if (confirm('Apakah Anda yakin ingin menghapus ticket ini? Tindakan ini tidak dapat dibatalkan.')) {
+            destroyTicket(destroy({ ticket: ticket.ticket_number }).url);
+        }
     };
 
     return (
@@ -44,20 +69,64 @@ export default function Show({ ticket }: { ticket: any }) {
                         <p className="text-muted-foreground">Oleh: {ticket.user?.name} ({ticket.user?.nim_nip})</p>
                     </div>
                     
-                    <form onSubmit={updateStatus} className="flex gap-2 items-center">
-                        <Select value={statusData.status} onValueChange={(v) => setStatusData('status', v)}>
-                            <SelectTrigger className="w-[150px]">
-                                <SelectValue placeholder="Status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Open">Open</SelectItem>
-                                <SelectItem value="In Progress">In Progress</SelectItem>
-                                <SelectItem value="Resolved">Resolved</SelectItem>
-                                <SelectItem value="Closed">Closed</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Button type="submit" variant="outline" disabled={processingStatus}>Update Status</Button>
-                    </form>
+                    <div className="flex gap-2 items-center">
+                        <form onSubmit={updateStatus} className="flex gap-2 items-center mr-4">
+                            <Select value={statusData.status} onValueChange={(v) => setStatusData('status', v)}>
+                                <SelectTrigger className="w-[150px]">
+                                    <SelectValue placeholder="Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Open">Open</SelectItem>
+                                    <SelectItem value="In Progress">In Progress</SelectItem>
+                                    <SelectItem value="Resolved">Resolved</SelectItem>
+                                    <SelectItem value="Closed">Closed</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Button type="submit" variant="outline" disabled={processingStatus}>Update Status</Button>
+                        </form>
+                        
+                        <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="secondary">Edit Ticket</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Edit Ticket</DialogTitle>
+                                </DialogHeader>
+                                <form onSubmit={submitEdit} className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label>Kategori</Label>
+                                        <Select value={editData.category} onValueChange={(v) => setEditData('category', v)}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Pilih kategori" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Data Sertifikasi Dosen">Data Sertifikasi Dosen</SelectItem>
+                                                <SelectItem value="Data Mahasiswa">Data Mahasiswa</SelectItem>
+                                                <SelectItem value="Program Magang Berdampak">Program Magang Berdampak</SelectItem>
+                                                <SelectItem value="Data Kerjasama">Data Kerjasama</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Deskripsi</Label>
+                                        <Textarea
+                                            required
+                                            value={editData.message}
+                                            onChange={e => setEditData('message', e.target.value)}
+                                            rows={6}
+                                        />
+                                    </div>
+                                    <DialogFooter>
+                                        <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>Batal</Button>
+                                        <Button type="submit" disabled={processingEdit}>Simpan Perubahan</Button>
+                                    </DialogFooter>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
+
+                        <Button variant="destructive" onClick={handleDelete} disabled={processingDestroy}>Hapus Ticket</Button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
