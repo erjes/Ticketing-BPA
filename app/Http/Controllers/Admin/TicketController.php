@@ -70,6 +70,27 @@ class TicketController extends Controller
         ]);
     }
 
+    public function searchSuggestions(Request $request)
+    {
+        $search = $request->query('query');
+        if (!$search) return response()->json([]);
+
+        $tickets = Ticket::with('user:id,name,nim_nip')
+            ->where(function ($q) use ($search) {
+                $q->where('ticket_number', 'like', "%{$search}%")
+                  ->orWhere('subject', 'like', "%{$search}%")
+                  ->orWhereHas('user', function ($qu) use ($search) {
+                      $qu->where('name', 'like', "%{$search}%")
+                         ->orWhere('nim_nip', 'like', "%{$search}%");
+                  });
+            })
+            ->latest()
+            ->limit(5)
+            ->get(['id', 'ticket_number', 'subject', 'category', 'status', 'user_id']);
+
+        return response()->json($tickets);
+    }
+
     public function show(Ticket $ticket)
     {
         $ticket->load(['user', 'replies.user', 'admin', 'attachments']);

@@ -19,6 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:user', 'profile.complete'])->group(function () {
         Route::get('dashboard', [TicketController::class, 'index'])->name('dashboard');
         Route::get('tickets', [\App\Http\Controllers\TicketController::class, 'tickets'])->name('tickets.index');
+        Route::get('tickets/search-suggestions', [TicketController::class, 'searchSuggestions'])->name('tickets.search-suggestions');
         Route::get('tickets/create', [TicketController::class, 'create'])->name('tickets.create');
         Route::post('tickets', [TicketController::class, 'store'])->name('tickets.store');
         Route::get('tickets/{ticket:ticket_number}', [TicketController::class, 'show'])->name('tickets.show');
@@ -29,6 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [App\Http\Controllers\Admin\TicketController::class, 'index'])->name('dashboard');
         Route::get('tickets', [\App\Http\Controllers\Admin\TicketController::class, 'tickets'])->name('tickets.index');
+        Route::get('tickets/search-suggestions', [App\Http\Controllers\Admin\TicketController::class, 'searchSuggestions'])->name('tickets.search-suggestions');
         Route::get('tickets/category', [TicketController::class, 'categoryIndex'])->name('tickets.category');
         Route::get('tickets/{ticket:ticket_number}', [App\Http\Controllers\Admin\TicketController::class, 'show'])->name('tickets.show');
         Route::put('tickets/{ticket:ticket_number}', [\App\Http\Controllers\Admin\TicketController::class, 'update'])->name('tickets.update');

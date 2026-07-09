@@ -21,9 +21,27 @@ class TicketController extends Controller
     {
         $tickets = Ticket::where('user_id', $request->user()->id)->latest()->get();
 
-        return Inertia::render('Dashboard', [
+        return Inertia::render('Tickets/Index', [
             'tickets' => $tickets,
         ]);
+    }
+
+    public function searchSuggestions(Request $request)
+    {
+        $search = $request->query('query');
+        if (!$search) return response()->json([]);
+
+        $tickets = Ticket::where('user_id', $request->user()->id)
+            ->where(function ($q) use ($search) {
+                $q->where('ticket_number', 'like', "%{$search}%")
+                  ->orWhere('subject', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->limit(5)
+            ->get(['ticket_number', 'subject', 'category', 'status']);
+            
+        return response()->json($tickets);
     }
 
     public function create()
