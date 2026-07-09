@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { dashboard } from '@/routes/admin';
 import { status, reply, update, destroy } from '@/routes/admin/tickets';
-import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 export default function Show({ ticket, categories }: { ticket: any, categories: string[] }) {
