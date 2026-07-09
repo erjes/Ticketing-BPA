@@ -1,4 +1,4 @@
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { dashboard } from '@/routes/admin';
-import { status, reply, update, destroy } from '@/routes/admin/tickets';
+import SimpleMdeReact from 'react-simplemde-editor';
+import 'easymde/dist/easymde.min.css';
 import ReactMarkdown from 'react-markdown';
 
 export default function Show({ ticket, categories }: { ticket: any, categories: string[] }) {
@@ -17,9 +17,10 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
         status: ticket.status,
     });
 
-    const { data: replyData, setData: setReplyData, post: postReply, processing: processingReply, reset: resetReply } = useForm({
+    const { data: replyData, setData: setReplyData, post: postReply, processing: processingReply, reset: resetReply, errors: replyErrors } = useForm({
         message: '',
         is_internal: false,
+        attachments: [] as File[],
     });
 
     const { data: editData, setData: setEditData, put: putEdit, processing: processingEdit } = useForm({
@@ -29,29 +30,31 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
 
     const { delete: destroyTicket, processing: processingDestroy } = useForm();
     const [editOpen, setEditOpen] = useState(false);
+    const [previewFile, setPreviewFile] = useState<any>(null);
 
     const updateStatus = (e: React.FormEvent) => {
         e.preventDefault();
-        postStatus(status({ ticket: ticket.ticket_number }).url);
+        postStatus(`/admin/tickets/${ticket.ticket_number}/status`);
     };
 
     const sendReply = (e: React.FormEvent) => {
         e.preventDefault();
-        postReply(reply({ ticket: ticket.ticket_number }).url, {
-            onSuccess: () => resetReply('message'),
+        postReply(`/admin/tickets/${ticket.ticket_number}/reply`, {
+            forceFormData: true,
+            onSuccess: () => resetReply('message', 'attachments'),
         });
     };
 
     const submitEdit = (e: React.FormEvent) => {
         e.preventDefault();
-        putEdit(update({ ticket: ticket.ticket_number }).url, {
+        putEdit(`/admin/tickets/${ticket.ticket_number}`, {
             onSuccess: () => setEditOpen(false),
         });
     };
 
     const handleDelete = () => {
         if (confirm('Apakah Anda yakin ingin menghapus ticket ini? Tindakan ini tidak dapat dibatalkan.')) {
-            destroyTicket(destroy({ ticket: ticket.ticket_number }).url);
+            destroyTicket(`/admin/tickets/${ticket.ticket_number}`);
         }
     };
 
@@ -59,7 +62,7 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
         <>
             <Head title={`Admin Ticket ${ticket.ticket_number}`} />
             <div className="flex flex-1 flex-col gap-6 p-6 max-w-5xl mx-auto w-full">
-                <Link href={dashboard().url} className="text-sm text-muted-foreground hover:underline">
+                <Link href="/admin/dashboard" className="text-sm text-muted-foreground hover:underline">
                     ← Kembali ke Dashboard
                 </Link>
 
@@ -141,21 +144,19 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                                 <div className="mt-4 p-4 bg-muted rounded-md text-base prose prose-sm max-w-none">
                                     <ReactMarkdown>{ticket.description}</ReactMarkdown>
                                 </div>
-                                {ticket.attachments && ticket.attachments.length > 0 && (
+                                {ticket.attachments && ticket.attachments.filter((f: any) => !f.ticket_reply_id).length > 0 && (
                                     <div className="mt-4 border-t pt-4">
-                                        <h4 className="text-sm font-semibold mb-2">Lampiran:</h4>
+                                        <h4 className="text-sm font-semibold mb-2">Lampiran Tiket:</h4>
                                         <div className="flex flex-wrap gap-2">
-                                            {ticket.attachments.map((file: any) => (
-                                                <a 
+                                            {ticket.attachments.filter((f: any) => !f.ticket_reply_id).map((file: any) => (
+                                                <button 
                                                     key={file.id} 
-                                                    href={`/storage/${file.file_path}`} 
-                                                    target="_blank" 
-                                                    rel="noreferrer"
+                                                    onClick={() => setPreviewFile(file)}
                                                     className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded px-3 py-2 text-sm text-blue-600 transition-colors"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                                                     {file.file_name}
-                                                </a>
+                                                </button>
                                             ))}
                                         </div>
                                     </div>
@@ -181,6 +182,23 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                                             <div className="mt-2 prose prose-sm max-w-none">
                                                 <ReactMarkdown>{reply.message}</ReactMarkdown>
                                             </div>
+                                            {reply.attachments && reply.attachments.length > 0 && (
+                                                <div className="mt-3 pt-3 border-t border-gray-200/50">
+                                                    <h5 className="text-xs font-semibold mb-2 text-gray-500 uppercase tracking-wider">Lampiran:</h5>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {reply.attachments.map((file: any) => (
+                                                            <button 
+                                                                key={file.id} 
+                                                                onClick={() => setPreviewFile(file)}
+                                                                className="flex items-center gap-1.5 bg-white/60 hover:bg-white border border-gray-200 rounded px-2.5 py-1.5 text-xs text-blue-600 transition-colors shadow-sm"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                                                                {file.file_name}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </CardContent>
                                     </Card>
                                 ))}
@@ -193,13 +211,52 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                             </CardHeader>
                             <CardContent>
                                 <form onSubmit={sendReply} className="flex flex-col gap-4">
-                                    <Textarea
-                                        required
-                                        value={replyData.message}
-                                        onChange={e => setReplyData('message', e.target.value)}
-                                        placeholder="Ketik pesan..."
-                                        rows={4}
-                                    />
+                                    <div className="grid gap-2">
+                                        <SimpleMdeReact 
+                                            value={replyData.message} 
+                                            onChange={(val) => setReplyData('message', val)}
+                                            options={{
+                                                spellChecker: false,
+                                                status: ['lines', 'words'],
+                                                placeholder: "Ketik pesan balasan...",
+                                            }}
+                                        />
+                                        {replyErrors.message && <p className="text-sm text-destructive">{replyErrors.message}</p>}
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <label className="flex items-center gap-2 border border-gray-300 rounded-md p-3 cursor-pointer hover:bg-gray-50 transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                                            <span className="text-sm text-gray-600 font-medium">Tambahkan Lampiran...</span>
+                                            <input 
+                                                type="file" 
+                                                multiple 
+                                                className="hidden" 
+                                                onChange={(e) => {
+                                                    if (e.target.files) {
+                                                        setReplyData('attachments', Array.from(e.target.files));
+                                                    }
+                                                }}
+                                                accept=".jpg,.gif,.jpeg,.png,.pdf,.doc,.docx,.zip"
+                                            />
+                                        </label>
+                                        {replyData.attachments.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 mt-2">
+                                                {replyData.attachments.map((file, i) => (
+                                                    <span key={i} className="text-xs bg-gray-100 px-2 py-1 rounded border">
+                                                        {file.name}
+                                                    </span>
+                                                ))}
+                                                <button 
+                                                    type="button" 
+                                                    onClick={() => setReplyData('attachments', [])}
+                                                    className="text-xs text-red-500 hover:underline"
+                                                >
+                                                    Hapus Semua
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className="flex justify-between items-center">
                                         <label className="flex items-center gap-2 cursor-pointer">
                                             <input
@@ -248,6 +305,34 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                     </div>
                 </div>
             </div>
+
+            {/* Preview Dialog */}
+            <Dialog open={!!previewFile} onOpenChange={(open) => !open && setPreviewFile(null)}>
+                <DialogContent className="max-w-4xl w-full h-[80vh] flex flex-col">
+                    <DialogHeader>
+                        <DialogTitle>Preview Lampiran: {previewFile?.file_name}</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex-1 overflow-hidden relative bg-gray-100/50 rounded-md flex items-center justify-center p-2">
+                        {previewFile && (
+                            previewFile.file_path.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? (
+                                <img src={`/storage/${previewFile.file_path}`} alt={previewFile.file_name} className="max-w-full max-h-full object-contain rounded" />
+                            ) : previewFile.file_path.match(/\.(pdf)$/i) ? (
+                                <iframe src={`/storage/${previewFile.file_path}`} className="w-full h-full border-0 rounded" title={previewFile.file_name} />
+                            ) : (
+                                <div className="text-center p-8 flex flex-col items-center justify-center h-full">
+                                    <div className="bg-white p-4 rounded-full shadow-sm mb-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                                    </div>
+                                    <p className="text-muted-foreground font-medium mb-6">Preview langsung tidak tersedia untuk format file ini.</p>
+                                    <a href={`/storage/${previewFile.file_path}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-[#8b1a1a] hover:bg-[#7a1212] transition-colors text-white rounded-md px-6 py-2.5 text-sm font-semibold shadow-sm">
+                                        Download / Buka File
+                                    </a>
+                                </div>
+                            )
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

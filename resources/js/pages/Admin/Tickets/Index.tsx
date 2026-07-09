@@ -1,7 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { dashboard } from '@/routes/admin';
-import { show } from '@/routes/admin/tickets';
 
 export default function Index({ tickets, currentStatus }: { tickets: any[], currentStatus?: string }) {
     return (
@@ -20,7 +18,7 @@ export default function Index({ tickets, currentStatus }: { tickets: any[], curr
                             </p>
                         )}
                     </div>
-                    <Link href={dashboard().url}>
+                    <Link href="/admin/dashboard">
                         <Button variant="outline">Kembali ke Dashboard</Button>
                     </Link>
                 </div>
@@ -52,7 +50,7 @@ export default function Index({ tickets, currentStatus }: { tickets: any[], curr
                                         </span>
                                     </td>
                                     <td className="px-4 py-3">
-                                        <Link href={show({ ticket: ticket.ticket_number }).url}>
+                                        <Link href={`/admin/tickets/${ticket.ticket_number}`}>
                                             <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10">Lihat detail →</Button>
                                         </Link>
                                     </td>

@@ -64,7 +64,7 @@ export default function Index({ tickets }: { tickets: any[] }) {
                     </Link>
                 </div>
 
-                <div ref={searchContainerRef} className="relative w-full max-w-xl mb-6">
+                <div ref={searchContainerRef} className="relative w-full max-w-xl mb-6 z-30">
                     <div className="relative flex items-center bg-card rounded-xl border shadow-sm p-1">
                         {isSearching ? (
                             <Loader2 className="w-5 h-5 text-muted-foreground ml-3 mr-2 flex-shrink-0 animate-spin" />

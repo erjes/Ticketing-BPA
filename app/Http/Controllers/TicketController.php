@@ -107,8 +107,8 @@ class TicketController extends Controller
         }
 
         $ticket->load(['replies' => function ($query) {
-            $query->where('is_internal', false)->with('user');
-        }, 'admin']);
+            $query->where('is_internal', false)->with(['user', 'attachments']);
+        }, 'admin', 'attachments']);
 
         return Inertia::render('Tickets/Show', [
             'ticket' => $ticket,
@@ -123,13 +123,27 @@ class TicketController extends Controller
 
         $request->validate([
             'message' => 'required|string',
+            'attachments.*' => 'file|mimes:jpg,jpeg,png,gif,pdf,doc,docx,zip|max:10240',
         ]);
 
-        $ticket->replies()->create([
+        $reply = $ticket->replies()->create([
             'user_id' => $request->user()->id,
             'message' => $request->message,
             'is_internal' => false,
         ]);
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $path = $file->store('tickets', 'public');
+                $ticket->attachments()->create([
+                    'ticket_reply_id' => $reply->id,
+                    'file_path' => $path,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                ]);
+            }
+        }
 
         \App\Models\ActivityLog::create([
             'user_id' => $request->user()->id,

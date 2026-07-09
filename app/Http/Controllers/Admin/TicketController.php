@@ -93,7 +93,7 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
-        $ticket->load(['user', 'replies.user', 'admin', 'attachments']);
+        $ticket->load(['user', 'replies.user', 'replies.attachments', 'admin', 'attachments']);
         $categories = \App\Models\TicketCategory::orderBy('name')->pluck('name');
 
         return Inertia::render('Admin/Tickets/Show', [
@@ -171,13 +171,27 @@ class TicketController extends Controller
         $request->validate([
             'message' => 'required|string',
             'is_internal' => 'boolean',
+            'attachments.*' => 'file|mimes:jpg,jpeg,png,gif,pdf,doc,docx,zip|max:10240',
         ]);
 
         $reply = $ticket->replies()->create([
             'user_id' => $request->user()->id,
             'message' => $request->message,
-            'is_internal' => $request->is_internal ?? false,
+            'is_internal' => filter_var($request->is_internal, FILTER_VALIDATE_BOOLEAN),
         ]);
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $path = $file->store('tickets', 'public');
+                $ticket->attachments()->create([
+                    'ticket_reply_id' => $reply->id,
+                    'file_path' => $path,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                ]);
+            }
+        }
 
         $ticket->update(['admin_id' => $request->user()->id]);
 

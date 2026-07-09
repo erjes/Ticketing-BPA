@@ -71,9 +71,9 @@ export default function Dashboard({ stats, categories, searchResults, filters }:
             <Head title="Admin Dashboard" />
             <div className="flex flex-1 flex-col gap-8 p-6">
                 {/* Red Welcome Banner with Search */}
-                <div className="bg-gradient-to-r from-[#8b1a1a] via-[#7a1212] to-[#6b0b0b] text-white rounded-3xl p-8 md:p-12 text-center relative overflow-hidden shadow-lg">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.05),transparent_50%)]" />
-                    <div className="relative z-10 flex flex-col items-center max-w-3xl mx-auto">
+                <div className="bg-gradient-to-r from-[#8b1a1a] via-[#7a1212] to-[#6b0b0b] text-white rounded-3xl p-8 md:p-12 text-center relative shadow-lg">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.05),transparent_50%)] rounded-3xl overflow-hidden" />
+                    <div className="relative flex flex-col items-center max-w-3xl mx-auto">
                         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight flex items-center justify-center gap-2">
                             Halo, {auth.user?.name || 'Staff Baru'} <span className="animate-bounce">👋</span>
                         </h1>
