@@ -1,13 +1,12 @@
-import { Head, useForm, Link, usePage } from '@inertiajs/react';
+import { Head, useForm, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { dashboard } from '@/routes/admin';
 import { status, reply } from '@/routes/admin/tickets';
 
 export default function Show({ ticket }: { ticket: any }) {
-    const { auth } = usePage().props as any;
     
     const { data: statusData, setData: setStatusData, post: postStatus, processing: processingStatus } = useForm({
         status: ticket.status,
@@ -46,7 +45,7 @@ export default function Show({ ticket }: { ticket: any }) {
                     
                     <form onSubmit={updateStatus} className="flex gap-2 items-center">
                         <Select value={statusData.status} onValueChange={(v) => setStatusData('status', v)}>
-                            <SelectTrigger className="w-[150px]">
+                            <SelectTrigger className="w-37.5">
                                 <SelectValue placeholder="Status" />
                             </SelectTrigger>
                             <SelectContent>

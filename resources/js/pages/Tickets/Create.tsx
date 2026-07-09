@@ -1,12 +1,12 @@
 import { Head, useForm, usePage, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { store } from '@/routes/tickets';
+import { Textarea } from '@/components/ui/textarea';
 import { dashboard } from '@/routes';
+import { store } from '@/routes/tickets';
 
 const categories = [
     'Data Sertifikasi Dosen',
