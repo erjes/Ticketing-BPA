@@ -29,14 +29,14 @@ export function AppSidebar() {
     if (role === 'super_admin') {
         defaultDashboardUrl = superAdminDashboard().url;
         mainNavItems.push({
-            title: 'Dashboard Super Admin',
-            href: superAdminDashboard().url,
-            icon: LayoutGrid,
-        });
-        mainNavItems.push({
             title: 'Manajemen Pengguna',
             href: superAdminDashboard().url,
             icon: Users,
+        });
+        mainNavItems.push({
+            title: 'Activity Logs',
+            href: '/super-admin/activity-logs',
+            icon: BookOpen,
         });
     } else if (role === 'admin') {
         defaultDashboardUrl = adminDashboard().url;
@@ -44,6 +44,16 @@ export function AppSidebar() {
             title: 'Dashboard Admin',
             href: adminDashboard().url,
             icon: LayoutGrid,
+        });
+        mainNavItems.push({
+            title: 'Daftar Tiket',
+            href: '/admin/tickets',
+            icon: TicketPlus,
+        });
+        mainNavItems.push({
+            title: 'Activity Logs',
+            href: '/admin/activity-logs',
+            icon: BookOpen,
         });
     } else {
         defaultDashboardUrl = userDashboard().url;
@@ -56,6 +66,11 @@ export function AppSidebar() {
             title: 'Buat Ticket',
             href: createTicket().url,
             icon: TicketPlus,
+        });
+        mainNavItems.push({
+            title: 'Riwayat Ticket',
+            href: '/tickets',
+            icon: BookOpen,
         });
     }
 

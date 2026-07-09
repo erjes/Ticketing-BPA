@@ -55,11 +55,11 @@ export default function Create() {
                                     </div>
                                     <div className="grid gap-2">
                                         <Label>NIM/NIP</Label>
-                                        <Input disabled value={auth.user.nim_nip} />
+                                        <Input disabled value={auth.nim_nip} />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="grid gap-2">
+                                    <div className="grid gap-2">user
                                         <Label>Status</Label>
                                         <Input disabled value={auth.user.status} />
                                     </div>
