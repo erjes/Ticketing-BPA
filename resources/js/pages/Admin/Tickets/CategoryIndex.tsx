@@ -5,6 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
+const isSlaOverdue = (ticket: any) => {
+    if (ticket.status === 'Resolved' || ticket.status === 'Closed') return false;
+    const createdAt = new Date(ticket.created_at).getTime();
+    const now = new Date().getTime();
+    const diffHours = (now - createdAt) / (1000 * 60 * 60);
+    return diffHours > 24;
+};
+
 const CATEGORY_CONFIG = {
     'Data Sertifikasi Dosen': {
         description: 'Pengajuan dan verifikasi sertifikasi dosen BPA.',
@@ -108,7 +116,16 @@ export default function CategoryIndex({ category, tickets, filters }: { category
                             <tbody className="divide-y divide-muted">
                                 {tickets.map((ticket) => (
                                     <tr key={ticket.id} className="hover:bg-muted/30 transition-colors">
-                                        <td className="px-6 py-4 font-bold text-foreground">{ticket.ticket_number}</td>
+                                        <td className="px-6 py-4 font-bold text-foreground">
+                                            <div className="flex flex-col gap-1 items-start">
+                                                <span>{ticket.ticket_number}</span>
+                                                {isSlaOverdue(ticket) && (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 animate-pulse border border-red-200" title="SLA Overdue (>24 jam)">
+                                                        ⚠️ SLA OVERDUE (&gt;24j)
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </td>
                                         <td className="px-6 py-4 font-medium text-foreground">{ticket.user?.name}</td>
                                         <td className="px-6 py-4 text-muted-foreground">{ticket.user?.nim_nip}</td>
                                         <td className="px-6 py-4">

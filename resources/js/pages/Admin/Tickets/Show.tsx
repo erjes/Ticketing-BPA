@@ -1,4 +1,4 @@
-import { Head, useForm, Link, usePage } from '@inertiajs/react';
+import { Head, useForm, Link, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +10,14 @@ import { Textarea } from '@/components/ui/textarea';
 import SimpleMdeReact from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
 import ReactMarkdown from 'react-markdown';
+
+const isSlaOverdue = (ticket: any) => {
+    if (ticket.status === 'Resolved' || ticket.status === 'Closed') return false;
+    const createdAt = new Date(ticket.created_at).getTime();
+    const now = new Date().getTime();
+    const diffHours = (now - createdAt) / (1000 * 60 * 60);
+    return diffHours > 24;
+};
 
 export default function Show({ ticket, categories }: { ticket: any, categories: string[] }) {
     const { auth } = usePage().props as any;
@@ -66,14 +74,21 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                     ← Kembali ke Dashboard
                 </Link>
 
-                <div className="flex justify-between items-start">
+                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold">Ticket: {ticket.ticket_number}</h1>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <h1 className="text-2xl font-bold">Ticket: {ticket.ticket_number}</h1>
+                            {isSlaOverdue(ticket) && (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-bold bg-red-100 text-red-700 animate-pulse border border-red-200 shadow-sm" title="SLA Overdue (>24 jam)">
+                                    <span>⚠️ SLA OVERDUE (&gt;24j)</span>
+                                </span>
+                            )}
+                        </div>
                         <p className="text-muted-foreground">Oleh: {ticket.user?.name} ({ticket.user?.nim_nip})</p>
                     </div>
 
-                    <div className="flex gap-2 items-center">
-                        <form onSubmit={updateStatus} className="flex gap-2 items-center mr-4">
+                    <div className="flex flex-wrap gap-2 items-center w-full xl:w-auto">
+                        <form onSubmit={updateStatus} className="flex gap-2 items-center w-full sm:w-auto mr-0 xl:mr-4">
                             <Select value={statusData.status} onValueChange={(v) => setStatusData('status', v)}>
                                 <SelectTrigger className="w-[150px]">
                                     <SelectValue placeholder="Status" />
@@ -275,6 +290,37 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                     </div>
 
                     <div>
+                        {ticket.rating !== null && (
+                            <Card className="mb-4 border-yellow-200 bg-yellow-50/30">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-base font-semibold text-yellow-800">Ulasan Kepuasan Pengguna</CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex flex-col gap-3 text-sm">
+                                    <div className="flex items-center gap-1">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <svg
+                                                key={star}
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                fill={ticket.rating >= star ? '#eab308' : 'none'}
+                                                stroke="#eab308"
+                                                strokeWidth="2"
+                                                className="w-5 h-5"
+                                            >
+                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                            </svg>
+                                        ))}
+                                        <span className="ml-2 font-semibold text-muted-foreground">{ticket.rating} / 5</span>
+                                    </div>
+                                    {ticket.feedback && (
+                                        <div className="p-3 bg-white rounded border text-xs text-gray-700 italic">
+                                            "{ticket.feedback}"
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
+
                         <Card>
                             <CardHeader>
                                 <CardTitle>Informasi Pengirim</CardTitle>
@@ -300,6 +346,31 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                                     <span className="text-muted-foreground block">Prodi/Unit</span>
                                     <span className="font-medium">{ticket.user?.prodi_unit}</span>
                                 </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="mt-4">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base font-semibold">Penanggung Jawab</CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex flex-col gap-3 text-sm">
+                                {ticket.admin ? (
+                                    <div>
+                                        <span className="text-muted-foreground block text-xs">Ditugaskan Kepada</span>
+                                        <span className="font-semibold text-foreground">{ticket.admin.name}</span>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col gap-2">
+                                        <span className="text-muted-foreground italic text-xs">Belum ada admin yang ditugaskan.</span>
+                                        <Button
+                                            onClick={() => router.post(`/admin/tickets/${ticket.ticket_number}/claim`, {}, { preserveScroll: true })}
+                                            className="w-full bg-[#8b1a1a] hover:bg-[#7a1212] text-white text-xs font-semibold py-1.5"
+                                            size="sm"
+                                        >
+                                            Klaim Tiket Ini
+                                        </Button>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </div>

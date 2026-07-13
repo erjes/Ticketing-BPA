@@ -62,14 +62,14 @@ export default function Index({ categories }: { categories: any[] }) {
         <>
             <Head title="Manajemen Kategori - Admin" />
             <div className="flex flex-1 flex-col gap-6 p-6">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div>
                         <h1 className="text-2xl font-bold">Manajemen Kategori</h1>
                         <p className="text-muted-foreground mt-1">Atur opsi kategori untuk sistem ticketing.</p>
                     </div>
                     <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                         <DialogTrigger asChild>
-                            <Button>Tambah Kategori</Button>
+                            <Button className="w-full sm:w-auto">Tambah Kategori</Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
@@ -105,8 +105,8 @@ export default function Index({ categories }: { categories: any[] }) {
                     </Dialog>
                 </div>
 
-                <div className="rounded-md border bg-white overflow-hidden shadow-sm">
-                    <table className="w-full text-sm text-left">
+                <div className="rounded-md border bg-white overflow-hidden shadow-sm overflow-x-auto">
+                    <table className="w-full text-sm text-left min-w-[500px]">
                         <thead className="bg-gray-50 border-b">
                             <tr>
                                 <th className="px-4 py-3 font-semibold text-gray-700 w-16">No</th>

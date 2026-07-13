@@ -1,12 +1,20 @@
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 
+const isSlaOverdue = (ticket: any) => {
+    if (ticket.status === 'Resolved' || ticket.status === 'Closed') return false;
+    const createdAt = new Date(ticket.created_at).getTime();
+    const now = new Date().getTime();
+    const diffHours = (now - createdAt) / (1000 * 60 * 60);
+    return diffHours > 24;
+};
+
 export default function Index({ tickets, currentStatus }: { tickets: any[], currentStatus?: string }) {
     return (
         <>
             <Head title="Daftar Ticket - Admin" />
             <div className="flex flex-1 flex-col gap-6 p-6">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div>
                         <h1 className="text-2xl font-bold">Daftar Ticket</h1>
                         {currentStatus && (
@@ -18,13 +26,13 @@ export default function Index({ tickets, currentStatus }: { tickets: any[], curr
                             </p>
                         )}
                     </div>
-                    <Link href="/admin/dashboard">
-                        <Button variant="outline">Kembali ke Dashboard</Button>
+                    <Link href="/admin/dashboard" className="w-full sm:w-auto">
+                        <Button variant="outline" className="w-full sm:w-auto">Kembali ke Dashboard</Button>
                     </Link>
                 </div>
 
-                <div className="rounded-md border bg-white overflow-hidden shadow-sm">
-                    <table className="w-full text-sm text-left">
+                <div className="rounded-md border bg-white overflow-hidden shadow-sm overflow-x-auto">
+                    <table className="w-full text-sm text-left min-w-[600px]">
                         <thead className="bg-gray-50 border-b">
                             <tr>
                                 <th className="px-4 py-3 font-semibold text-gray-700">No Ticket</th>
@@ -37,7 +45,16 @@ export default function Index({ tickets, currentStatus }: { tickets: any[], curr
                         <tbody className="divide-y">
                             {tickets && tickets.length > 0 ? tickets.map((ticket) => (
                                 <tr key={ticket.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-4 py-3 font-medium">{ticket.ticket_number}</td>
+                                    <td className="px-4 py-3 font-medium">
+                                        <div className="flex flex-col gap-1 items-start">
+                                            <span>{ticket.ticket_number}</span>
+                                            {isSlaOverdue(ticket) && (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 animate-pulse border border-red-200" title="SLA Overdue (>24 jam)">
+                                                    ⚠️ SLA OVERDUE (&gt;24j)
+                                                </span>
+                                            )}
+                                        </div>
+                                    </td>
                                     <td className="px-4 py-3">{ticket.user?.name}</td>
                                     <td className="px-4 py-3">{ticket.category}</td>
                                     <td className="px-4 py-3">

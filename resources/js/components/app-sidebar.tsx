@@ -51,14 +51,19 @@ export function AppSidebar() {
             icon: TicketPlus,
         });
         mainNavItems.push({
-            title: 'Activity Logs',
-            href: '/admin/activity-logs',
-            icon: BookOpen,
-        });
-        mainNavItems.push({
             title: 'Kategori Tiket',
             href: '/admin/categories',
             icon: LayoutGrid,
+        });
+        mainNavItems.push({
+            title: 'Manajemen FAQ',
+            href: '/admin/faqs',
+            icon: BookOpen,
+        });
+        mainNavItems.push({
+            title: 'Activity Logs',
+            href: '/admin/activity-logs',
+            icon: BookOpen,
         });
     } else {
         defaultDashboardUrl = userDashboard().url;
@@ -75,6 +80,11 @@ export function AppSidebar() {
         mainNavItems.push({
             title: 'Riwayat Ticket',
             href: '/tickets',
+            icon: BookOpen,
+        });
+        mainNavItems.push({
+            title: 'FAQ / Pusat Bantuan',
+            href: '/faqs',
             icon: BookOpen,
         });
     }

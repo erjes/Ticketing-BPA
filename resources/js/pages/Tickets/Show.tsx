@@ -9,13 +9,29 @@ import SimpleMdeReact from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
 import { dashboard } from '@/routes';
 import { create, reply } from '@/routes/tickets';
+import { Label } from '@/components/ui/label';
+
+const isSlaOverdue = (ticket: any) => {
+    if (ticket.status === 'Resolved' || ticket.status === 'Closed') return false;
+    const createdAt = new Date(ticket.created_at).getTime();
+    const now = new Date().getTime();
+    const diffHours = (now - createdAt) / (1000 * 60 * 60);
+    return diffHours > 24;
+};
 
 export default function Show({ ticket }: { ticket: any }) {
     const { auth } = usePage().props as any;
     const [previewFile, setPreviewFile] = useState<any>(null);
+    const [hoveredStar, setHoveredStar] = useState(0);
+
     const { data, setData, post, processing, reset, errors } = useForm({
         message: '',
         attachments: [] as File[],
+    });
+
+    const { data: rateData, setData: setRateData, post: postRate, processing: processingRate } = useForm({
+        rating: 0,
+        feedback: '',
     });
 
     const submit = (e: React.FormEvent) => {
@@ -24,6 +40,15 @@ export default function Show({ ticket }: { ticket: any }) {
             forceFormData: true,
             onSuccess: () => reset('message', 'attachments'),
         });
+    };
+
+    const handleRateSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (rateData.rating === 0) {
+            alert('Silakan pilih rating bintang terlebih dahulu.');
+            return;
+        }
+        postRate(`/tickets/${ticket.ticket_number}/rate`);
     };
 
     return (
@@ -38,28 +63,118 @@ export default function Show({ ticket }: { ticket: any }) {
                     <div className="md:col-span-2 flex flex-col gap-6">
                         <Card className={ticket.status === 'Open' ? 'border-green-200 bg-green-50/50' : ''}>
                             <CardHeader className="pb-4">
-                                <div className="flex justify-between items-start">
+                                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                                     <div>
                                         <CardTitle className="text-2xl text-primary mb-2">Ticket berhasil dibuat</CardTitle>
                                         <CardDescription className="text-base text-foreground">
                                             Nomor ticket: <span className="font-semibold">{ticket.ticket_number}</span>
                                         </CardDescription>
                                     </div>
-                                    <span className={`px-3 py-1 rounded text-sm font-semibold ${
-                                        ticket.status === 'Open' ? 'bg-green-100 text-green-800' :
-                                        ticket.status === 'In Progress' ? 'bg-orange-100 text-orange-800' :
-                                        'bg-gray-100 text-gray-800'
-                                    }`}>
-                                        {ticket.status}
-                                    </span>
-                                </div>
-                            </CardHeader>
+                                     <div className="flex flex-wrap gap-2 items-center">
+                                         <span className={`px-3 py-1 rounded text-sm font-semibold ${
+                                             ticket.status === 'Open' ? 'bg-green-100 text-green-800' :
+                                             ticket.status === 'In Progress' ? 'bg-orange-100 text-orange-800' :
+                                             'bg-gray-100 text-gray-800'
+                                         }`}>
+                                             {ticket.status}
+                                         </span>
+                                         {isSlaOverdue(ticket) && (
+                                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-bold bg-red-100 text-red-700 animate-pulse border border-red-200 shadow-sm" title="SLA Overdue (>24 jam)">
+                                                 <span>⚠️ SLA OVERDUE (&gt;24j)</span>
+                                             </span>
+                                         )}
+                                     </div>
+                                 </div>
+                             </CardHeader>
                             {ticket.status === 'Open' && (
                                 <CardContent>
                                     <p className="text-muted-foreground">Admin BPA akan meninjau pertanyaan Anda.</p>
                                 </CardContent>
                             )}
                         </Card>
+
+                        {(ticket.status === 'Resolved' || ticket.status === 'Closed') && (
+                             ticket.rating === null ? (
+                                 <Card className="border-yellow-200 bg-yellow-50/30">
+                                     <CardHeader className="pb-2">
+                                         <CardTitle className="text-lg text-yellow-800 flex items-center gap-2">
+                                             <span>⭐ Ulasan Kepuasan Layanan (CSAT)</span>
+                                         </CardTitle>
+                                         <CardDescription>Bagaimana penilaian Anda terhadap penanganan tiket ini?</CardDescription>
+                                     </CardHeader>
+                                     <CardContent className="pt-2">
+                                         <form onSubmit={handleRateSubmit} className="space-y-4">
+                                             <div className="flex items-center gap-2">
+                                                 {[1, 2, 3, 4, 5].map((star) => (
+                                                     <button
+                                                         key={star}
+                                                         type="button"
+                                                         onClick={() => setRateData('rating', star)}
+                                                         onMouseEnter={() => setHoveredStar(star)}
+                                                         onMouseLeave={() => setHoveredStar(0)}
+                                                         className="transition-transform duration-100 hover:scale-125 focus:outline-none"
+                                                     >
+                                                         <svg
+                                                             xmlns="http://www.w3.org/2000/svg"
+                                                             viewBox="0 0 24 24"
+                                                             fill={(hoveredStar || rateData.rating) >= star ? '#eab308' : 'none'}
+                                                             stroke="#eab308"
+                                                             strokeWidth="2"
+                                                             className="w-8 h-8"
+                                                         >
+                                                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                                         </svg>
+                                                     </button>
+                                                 ))}
+                                             </div>
+                                             <div className="space-y-1">
+                                                 <Label htmlFor="feedback">Masukan / Kritik & Saran (Opsional)</Label>
+                                                 <Textarea
+                                                     id="feedback"
+                                                     value={rateData.feedback}
+                                                     onChange={e => setRateData('feedback', e.target.value)}
+                                                     placeholder="Tulis masukan Anda di sini..."
+                                                     className="bg-white border-yellow-200 focus-visible:ring-yellow-400"
+                                                 />
+                                             </div>
+                                             <Button type="submit" disabled={processingRate} className="bg-yellow-600 hover:bg-yellow-700 text-white">
+                                                 Kirim Ulasan
+                                             </Button>
+                                         </form>
+                                     </CardContent>
+                                 </Card>
+                             ) : (
+                                 <Card className="border-emerald-200 bg-emerald-50/20">
+                                     <CardHeader className="pb-2">
+                                         <CardTitle className="text-lg text-emerald-800">Ulasan Anda</CardTitle>
+                                     </CardHeader>
+                                     <CardContent className="space-y-2">
+                                         <div className="flex items-center gap-1">
+                                             {[1, 2, 3, 4, 5].map((star) => (
+                                                 <svg
+                                                     key={star}
+                                                     xmlns="http://www.w3.org/2000/svg"
+                                                     viewBox="0 0 24 24"
+                                                     fill={ticket.rating >= star ? '#eab308' : 'none'}
+                                                     stroke="#eab308"
+                                                     strokeWidth="2"
+                                                     className="w-5 h-5"
+                                                 >
+                                                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                                 </svg>
+                                             ))}
+                                             <span className="ml-2 font-medium text-sm text-muted-foreground">{ticket.rating} dari 5 bintang</span>
+                                         </div>
+                                         {ticket.feedback && (
+                                             <div className="p-3 bg-white rounded border border-emerald-100 text-sm">
+                                                 <p className="font-semibold text-xs text-muted-foreground mb-1">Masukan:</p>
+                                                 <p className="text-gray-700 italic">"{ticket.feedback}"</p>
+                                             </div>
+                                         )}
+                                     </CardContent>
+                                 </Card>
+                             )
+                         )}
 
                         <Card>
                             <CardHeader>

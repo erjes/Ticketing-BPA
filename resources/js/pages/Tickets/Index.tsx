@@ -6,6 +6,14 @@ import { Card } from '@/components/ui/card';
 import { show } from '@/routes/tickets';
 import { dashboard } from '@/routes';
 
+const isSlaOverdue = (ticket: any) => {
+    if (ticket.status === 'Resolved' || ticket.status === 'Closed') return false;
+    const createdAt = new Date(ticket.created_at).getTime();
+    const now = new Date().getTime();
+    const diffHours = (now - createdAt) / (1000 * 60 * 60);
+    return diffHours > 24;
+};
+
 export default function Index({ tickets }: { tickets: any[] }) {
     const [search, setSearch] = useState('');
     const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -124,12 +132,19 @@ export default function Index({ tickets }: { tickets: any[] }) {
                     <div className="flex flex-col gap-3">
                         {tickets.map((ticket: any) => (
                             <Card key={ticket.id}>
-                                <div className="flex items-center justify-between p-4">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4">
                                     <div>
-                                        <p className="font-semibold text-lg">{ticket.ticket_number}</p>
-                                        <p className="text-sm text-muted-foreground">{ticket.category} &middot; {new Date(ticket.created_at).toLocaleDateString()}</p>
+                                         <div className="flex flex-wrap items-center gap-2 mb-1">
+                                             <p className="font-semibold text-lg">{ticket.ticket_number}</p>
+                                             {isSlaOverdue(ticket) && (
+                                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 animate-pulse border border-red-200" title="SLA Overdue (>24 jam)">
+                                                     ⚠️ SLA OVERDUE (&gt;24j)
+                                                 </span>
+                                             )}
+                                         </div>
+                                         <p className="text-sm text-muted-foreground">{ticket.category} &middot; {new Date(ticket.created_at).toLocaleDateString()}</p>
                                     </div>
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center justify-between w-full sm:w-auto gap-4">
                                         <span className={`px-2 py-1 rounded text-xs font-semibold ${
                                             ticket.status === 'Open' ? 'bg-green-100 text-green-800' :
                                             ticket.status === 'In Progress' ? 'bg-orange-100 text-orange-800' :

@@ -10,13 +10,13 @@ export default function Dashboard({ categories }: { categories: string[] }) {
         <>
             <Head title="Dashboard" />
             <div className="flex flex-1 flex-col gap-6 p-6">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <h1 className="text-2xl font-bold">Halo, {auth.user.name} 👋</h1>
-                        <p className="text-muted-foreground">Silakan pilih kategori untuk mengirim pertanyaan ke BPA.</p>
+                        <p className="text-muted-foreground mt-1">Silakan pilih kategori untuk mengirim pertanyaan ke BPA.</p>
                     </div>
-                    <Link href={create().url}>
-                        <Button>Buat Ticket</Button>
+                    <Link href={create().url} className="w-full md:w-auto">
+                        <Button className="w-full md:w-auto">Buat Ticket</Button>
                     </Link>
                 </div>
 

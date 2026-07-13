@@ -97,14 +97,23 @@ class TicketController extends Controller
             'model_id' => $ticket->id,
         ]);
 
+        $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new \App\Notifications\NewTicketCreated($ticket));
+        }
+
         return redirect()->route('tickets.show', $ticket->ticket_number);
     }
 
-    public function show(Ticket $ticket)
+    public function show(Request $request, Ticket $ticket)
     {
-        if ($ticket->user_id !== request()->user()->id) {
+        if ($ticket->user_id !== $request->user()->id) {
             abort(403);
         }
+
+        $request->user()->unreadNotifications
+            ->where('data.ticket_id', $ticket->id)
+            ->markAsRead();
 
         $ticket->load(['replies' => function ($query) {
             $query->where('is_internal', false)->with(['user', 'attachments']);
@@ -145,10 +154,46 @@ class TicketController extends Controller
             }
         }
 
+        if ($ticket->admin_id) {
+            $ticket->admin->notify(new \App\Notifications\NewTicketReply($ticket, $reply));
+        } else {
+            $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\NewTicketReply($ticket, $reply));
+            }
+        }
+
         \App\Models\ActivityLog::create([
             'user_id' => $request->user()->id,
             'action' => 'reply_ticket',
             'description' => 'User membalas tiket',
+            'model_type' => Ticket::class,
+            'model_id' => $ticket->id,
+        ]);
+
+        return back();
+    }
+
+    public function rate(Request $request, Ticket $ticket)
+    {
+        if ($ticket->user_id !== $request->user()->id) {
+            abort(403);
+        }
+
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'feedback' => 'nullable|string|max:1000',
+        ]);
+
+        $ticket->update([
+            'rating' => $request->rating,
+            'feedback' => $request->feedback,
+        ]);
+
+        \App\Models\ActivityLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'rate_ticket',
+            'description' => "User memberikan rating {$request->rating} untuk tiket {$ticket->ticket_number}",
             'model_type' => Ticket::class,
             'model_id' => $ticket->id,
         ]);

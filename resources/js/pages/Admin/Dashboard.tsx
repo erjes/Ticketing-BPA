@@ -5,7 +5,138 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-export default function Dashboard({ stats, categories, searchResults, filters }: { stats: any, categories: any[], searchResults: any[] | null, filters: { search: string } }) {
+const isSlaOverdue = (ticket: any) => {
+    if (ticket.status === 'Resolved' || ticket.status === 'Closed') return false;
+    const createdAt = new Date(ticket.created_at).getTime();
+    const now = new Date().getTime();
+    const diffHours = (now - createdAt) / (1000 * 60 * 60);
+    return diffHours > 24;
+};
+
+function SVGLineChart({ data }: { data: { date: string, count: number }[] }) {
+    if (!data || data.length === 0) return null;
+    const maxVal = Math.max(...data.map(d => d.count), 5);
+    const width = 600;
+    const height = 220;
+    const paddingLeft = 40;
+    const paddingRight = 20;
+    const paddingTop = 20;
+    const paddingBottom = 40;
+
+    const chartWidth = width - paddingLeft - paddingRight;
+    const chartHeight = height - paddingTop - paddingBottom;
+
+    const points = data.map((d, index) => {
+        const x = paddingLeft + (index / (data.length - 1)) * chartWidth;
+        const y = height - paddingBottom - (d.count / maxVal) * chartHeight;
+        return { x, y, val: d.count, date: d.date };
+    });
+
+    const pathData = points.reduce((acc, p, i) => {
+        return i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`;
+    }, '');
+
+    const areaData = `${pathData} L ${points[points.length - 1].x} ${height - paddingBottom} L ${points[0].x} ${height - paddingBottom} Z`;
+
+    return (
+        <div className="w-full overflow-x-auto">
+            <svg viewBox={`0 0 ${width} ${height}`} className="w-full min-w-[500px] h-auto overflow-visible select-none">
+                <defs>
+                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#8b1a1a" stopOpacity="0.25" />
+                        <stop offset="100%" stopColor="#8b1a1a" stopOpacity="0.0" />
+                    </linearGradient>
+                </defs>
+
+                {[0, 0.25, 0.5, 0.75, 1].map((ratio, idx) => {
+                    const y = paddingTop + ratio * chartHeight;
+                    const val = Math.round(maxVal * (1 - ratio));
+                    return (
+                        <g key={idx} className="opacity-40">
+                            <line
+                                x1={paddingLeft}
+                                y1={y}
+                                x2={width - paddingRight}
+                                y2={y}
+                                stroke="currentColor"
+                                strokeDasharray="3 3"
+                                className="text-muted-foreground/30"
+                            />
+                            <text
+                                x={paddingLeft - 10}
+                                y={y + 4}
+                                textAnchor="end"
+                                className="text-[10px] fill-muted-foreground font-medium"
+                            >
+                                {val}
+                            </text>
+                        </g>
+                    );
+                })}
+
+                <path d={areaData} fill="url(#chartGradient)" />
+
+                <path
+                    d={pathData}
+                    fill="none"
+                    stroke="#8b1a1a"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="drop-shadow-[0_4px_6px_rgba(139,26,26,0.3)]"
+                />
+
+                {points.map((p, idx) => (
+                    <g key={idx} className="group/point cursor-pointer">
+                        <circle
+                            cx={p.x}
+                            cy={p.y}
+                            r="5"
+                            fill="#8b1a1a"
+                            stroke="white"
+                            strokeWidth="2"
+                            className="transition-all duration-200 group-hover/point:r-7"
+                        />
+                        <g className="opacity-0 group-hover/point:opacity-100 transition-opacity duration-200 pointer-events-none">
+                            <rect
+                                x={p.x - 30}
+                                y={p.y - 35}
+                                width="60"
+                                height="24"
+                                rx="4"
+                                fill="#1f2937"
+                                className="shadow-lg"
+                            />
+                            <text
+                                x={p.x}
+                                y={p.y - 19}
+                                textAnchor="middle"
+                                fill="white"
+                                className="text-[10px] font-bold"
+                            >
+                                {p.val} Tiket
+                            </text>
+                        </g>
+                    </g>
+                ))}
+
+                {points.map((p, idx) => (
+                    <text
+                        key={idx}
+                        x={p.x}
+                        y={height - 15}
+                        textAnchor="middle"
+                        className="text-[10px] fill-muted-foreground font-medium"
+                    >
+                        {p.date}
+                    </text>
+                ))}
+            </svg>
+        </div>
+    );
+}
+
+export default function Dashboard({ stats, categories, searchResults, trend = [], csatStats = { average: 0, total: 0, breakdown: [] }, filters }: { stats: any, categories: any[], searchResults: any[] | null, trend?: any[], csatStats?: any, filters: { search: string } }) {
     const { auth } = usePage().props as any;
     const [search, setSearch] = useState(filters.search || '');
     const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -178,6 +309,102 @@ export default function Dashboard({ stats, categories, searchResults, filters }:
                     </Card>
                 </div>
 
+                {/* Analytics & Charts Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl mx-auto w-full px-4">
+                    <Card className="lg:col-span-2 p-6 shadow-sm border">
+                        <div className="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 className="text-lg font-bold">Tren Tiket Masuk</h3>
+                                <p className="text-xs text-muted-foreground">Statistik jumlah tiket masuk selama 7 hari terakhir.</p>
+                            </div>
+                        </div>
+                        <SVGLineChart data={trend} />
+                    </Card>
+
+                    <Card className="p-6 shadow-sm border flex flex-col justify-between">
+                        <div>
+                            <h3 className="text-lg font-bold mb-1">Kepuasan Pengguna (CSAT)</h3>
+                            <p className="text-xs text-muted-foreground mb-6">Rata-rata kepuasan layanan berdasarkan ulasan.</p>
+                            
+                            <div className="flex flex-col items-center justify-center py-4 bg-yellow-50/20 border border-yellow-100 rounded-xl mb-4 text-center">
+                                <div className="text-4xl font-black text-yellow-600 mb-1 flex items-baseline gap-1">
+                                    <span>{csatStats.average}</span>
+                                    <span className="text-xs text-muted-foreground font-normal">/ 5.0</span>
+                                </div>
+                                <div className="flex items-center gap-0.5 mb-1.5">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <svg
+                                            key={star}
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill={Math.round(csatStats.average) >= star ? '#eab308' : 'none'}
+                                            stroke="#eab308"
+                                            strokeWidth="2"
+                                            className="w-5 h-5"
+                                        >
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                        </svg>
+                                    ))}
+                                </div>
+                                <div className="text-xs text-muted-foreground font-medium">Dari {csatStats.total} Ulasan Tiket</div>
+                            </div>
+
+                            <div className="space-y-2">
+                                {csatStats.breakdown.map((row: any) => {
+                                    const percent = csatStats.total > 0 ? (row.count / csatStats.total) * 100 : 0;
+                                    return (
+                                        <div key={row.stars} className="flex items-center gap-2 text-xs font-medium">
+                                            <span className="w-12 text-muted-foreground flex items-center gap-1 font-semibold">
+                                                <span>{row.stars}</span>
+                                                <span className="text-yellow-500 text-[10px]">★</span>
+                                            </span>
+                                            <div className="flex-1 bg-gray-100 h-2 rounded-full overflow-hidden">
+                                                <div 
+                                                    className="bg-yellow-500 h-full rounded-full transition-all duration-500" 
+                                                    style={{ width: `${percent}%` }}
+                                                />
+                                            </div>
+                                            <span className="w-8 text-right text-muted-foreground">{row.count}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+
+                {/* Kategori Distribusi Row */}
+                <div className="max-w-5xl mx-auto w-full px-4">
+                    <Card className="p-6 shadow-sm border">
+                        <h3 className="text-lg font-bold mb-1">Distribusi Kategori</h3>
+                        <p className="text-xs text-muted-foreground mb-6">Persentase dan jumlah tiket berdasarkan kategori layanan.</p>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {categories.map((category) => {
+                                const totalTickets = categories.reduce((sum, c) => sum + (c.count || 0), 0);
+                                const percent = totalTickets > 0 ? ((category.count ?? 0) / totalTickets) * 100 : 0;
+                                return (
+                                    <div key={category.name} className="p-4 bg-muted/30 border rounded-xl flex flex-col justify-between gap-3">
+                                        <div className="flex justify-between items-start">
+                                            <span className="text-sm font-bold text-foreground truncate max-w-[150px]">{category.name}</span>
+                                            <span className="text-xs text-muted-foreground font-bold">{category.count ?? 0} Tiket</span>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="w-full bg-gray-200/50 rounded-full h-1.5 overflow-hidden">
+                                                <div 
+                                                    className="bg-[#8b1a1a] h-full rounded-full transition-all duration-500" 
+                                                    style={{ width: `${percent}%` }}
+                                                />
+                                            </div>
+                                            <div className="text-[10px] text-muted-foreground text-right font-medium">{percent.toFixed(0)}% dari total</div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </Card>
+                </div>
+
                 {/* Search Results Table (Conditional) */}
                 {searchResults !== null && (
                     <div className="mt-4">
@@ -210,7 +437,16 @@ export default function Dashboard({ stats, categories, searchResults, filters }:
                                     <tbody className="divide-y divide-muted">
                                         {searchResults.map((ticket: any) => (
                                             <tr key={ticket.id} className="hover:bg-muted/30 transition-colors">
-                                                <td className="px-6 py-4 font-bold text-foreground">{ticket.ticket_number}</td>
+                                                <td className="px-6 py-4 font-bold text-foreground">
+                                                    <div className="flex flex-col gap-1 items-start">
+                                                        <span>{ticket.ticket_number}</span>
+                                                        {isSlaOverdue(ticket) && (
+                                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 animate-pulse border border-red-200" title="SLA Overdue (>24 jam)">
+                                                                ⚠️ SLA OVERDUE (&gt;24j)
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
                                                 <td className="px-6 py-4 font-medium text-foreground">{ticket.user?.name}</td>
                                                 <td className="px-6 py-4 text-muted-foreground">{ticket.category}</td>
                                                 <td className="px-6 py-4">

@@ -42,6 +42,42 @@ class TicketController extends Controller
             ];
         });
 
+        $trend = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $label = now()->subDays($i)->translatedFormat('d M');
+            $count = Ticket::whereDate('created_at', $date)->count();
+            $trend[] = [
+                'date' => $label,
+                'count' => $count,
+            ];
+        }
+
+        // CSAT Statistics
+        $csatQuery = Ticket::whereNotNull('rating');
+        $totalRated = $csatQuery->count();
+        $averageRating = $totalRated > 0 ? round($csatQuery->avg('rating'), 1) : 0;
+        
+        $ratingCounts = Ticket::whereNotNull('rating')
+            ->select('rating', \DB::raw('count(*) as total'))
+            ->groupBy('rating')
+            ->pluck('total', 'rating')
+            ->toArray();
+
+        $ratingBreakdown = [];
+        for ($star = 5; $star >= 1; $star--) {
+            $ratingBreakdown[] = [
+                'stars' => $star,
+                'count' => $ratingCounts[$star] ?? 0,
+            ];
+        }
+
+        $csatStats = [
+            'average' => $averageRating,
+            'total' => $totalRated,
+            'breakdown' => $ratingBreakdown,
+        ];
+
         return Inertia::render('Admin/Dashboard', [
             'stats' => [
                 'open' => Ticket::where('status', 'Open')->count(),
@@ -50,6 +86,8 @@ class TicketController extends Controller
             ],
             'categories' => $categories,
             'searchResults' => $searchResults,
+            'trend' => $trend,
+            'csatStats' => $csatStats,
             'filters' => [
                 'search' => $search ?? '',
             ],
@@ -91,8 +129,12 @@ class TicketController extends Controller
         return response()->json($tickets);
     }
 
-    public function show(Ticket $ticket)
+    public function show(Request $request, Ticket $ticket)
     {
+        $request->user()->unreadNotifications
+            ->where('data.ticket_id', $ticket->id)
+            ->markAsRead();
+
         $ticket->load(['user', 'replies.user', 'replies.attachments', 'admin', 'attachments']);
         $categories = \App\Models\TicketCategory::orderBy('name')->pluck('name');
 
@@ -155,6 +197,8 @@ class TicketController extends Controller
             'admin_id' => $request->user()->id,
         ]);
 
+        $ticket->user->notify(new \App\Notifications\TicketStatusUpdated($ticket, $oldStatus, $request->status));
+
         \App\Models\ActivityLog::create([
             'user_id' => $request->user()->id,
             'action' => 'update_ticket_status',
@@ -195,10 +239,32 @@ class TicketController extends Controller
 
         $ticket->update(['admin_id' => $request->user()->id]);
 
+        if (!$reply->is_internal) {
+            $ticket->user->notify(new \App\Notifications\NewTicketReply($ticket, $reply));
+        }
+
         \App\Models\ActivityLog::create([
             'user_id' => $request->user()->id,
             'action' => 'reply_ticket',
             'description' => $request->is_internal ? 'Admin menambahkan catatan internal' : 'Admin membalas tiket',
+            'model_type' => Ticket::class,
+            'model_id' => $ticket->id,
+        ]);
+
+        return back();
+    }
+
+    public function claim(Request $request, Ticket $ticket)
+    {
+        $ticket->update([
+            'admin_id' => $request->user()->id,
+            'status' => $ticket->status === 'Open' ? 'In Progress' : $ticket->status
+        ]);
+
+        \App\Models\ActivityLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'claim_ticket',
+            'description' => "Admin mengeklaim penugasan tiket {$ticket->ticket_number}",
             'model_type' => Ticket::class,
             'model_id' => $ticket->id,
         ]);

@@ -15,6 +15,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('onboarding', [OnboardingController::class, 'show'])->name('onboarding');
     Route::post('onboarding', [OnboardingController::class, 'store'])->name('onboarding.store');
 
+    // Global Routes (Accessible to all authenticated users)
+    Route::get('notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
+    
     // User Routes
     Route::middleware(['role:user', 'profile.complete'])->group(function () {
         Route::get('dashboard', [TicketController::class, 'index'])->name('dashboard');
@@ -24,6 +29,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('tickets', [TicketController::class, 'store'])->name('tickets.store');
         Route::get('tickets/{ticket:ticket_number}', [TicketController::class, 'show'])->name('tickets.show');
         Route::post('tickets/{ticket:ticket_number}/reply', [TicketController::class, 'reply'])->name('tickets.reply');
+        Route::post('tickets/{ticket:ticket_number}/rate', [TicketController::class, 'rate'])->name('tickets.rate');
+        Route::get('faqs', [\App\Http\Controllers\FaqController::class, 'index'])->name('faqs.index');
     });
 
     // Admin Routes
@@ -37,16 +44,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('tickets/{ticket:ticket_number}', [\App\Http\Controllers\Admin\TicketController::class, 'destroy'])->name('tickets.destroy');
         Route::post('tickets/{ticket:ticket_number}/status', [App\Http\Controllers\Admin\TicketController::class, 'updateStatus'])->name('tickets.status');
         Route::post('tickets/{ticket:ticket_number}/reply', [App\Http\Controllers\Admin\TicketController::class, 'reply'])->name('tickets.reply');
+        Route::post('tickets/{ticket:ticket_number}/claim', [App\Http\Controllers\Admin\TicketController::class, 'claim'])->name('tickets.claim');
         
         Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
         
         Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->except(['create', 'show', 'edit']);
+        Route::resource('faqs', \App\Http\Controllers\Admin\FaqController::class)->except(['create', 'show', 'edit']);
     });
 
     // Super Admin Routes
     Route::middleware(['role:super_admin'])->prefix('super-admin')->name('superadmin.')->group(function () {
         Route::get('dashboard', [UserController::class, 'index'])->name('dashboard');
         Route::post('users/{user}/role', [UserController::class, 'updateRole'])->name('users.role');
+        Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
         Route::delete('users/{user}', [\App\Http\Controllers\SuperAdmin\UserController::class, 'destroy'])->name('users.destroy');
         
         Route::get('activity-logs', [\App\Http\Controllers\SuperAdmin\ActivityLogController::class, 'index'])->name('activity-logs.index');

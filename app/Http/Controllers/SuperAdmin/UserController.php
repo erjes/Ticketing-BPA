@@ -38,6 +38,56 @@ class UserController extends Controller
         return back();
     }
 
+    public function update(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'role' => 'required|in:user,admin,super_admin',
+            'nim_nip' => 'nullable|string|max:255',
+            'status' => 'nullable|string|in:Mahasiswa,Dosen,Pegawai',
+            'prodi_unit' => 'nullable|string|max:255',
+        ]);
+
+        $oldData = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'nim_nip' => $user->nim_nip,
+            'status' => $user->status,
+            'prodi_unit' => $user->prodi_unit,
+        ];
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'role' => $request->role,
+            'nim_nip' => $request->nim_nip,
+            'status' => $request->status,
+            'prodi_unit' => $request->prodi_unit,
+            'is_profile_complete' => $request->nim_nip && $request->status && $request->prodi_unit ? true : $user->is_profile_complete,
+        ]);
+
+        $changes = [];
+        foreach ($oldData as $key => $value) {
+            if ($user->$key != $value) {
+                $changes[] = "{$key}: '{$value}' menjadi '{$user->$key}'";
+            }
+        }
+        
+        $changeDescription = count($changes) > 0 ? implode(', ', $changes) : 'tidak ada perubahan';
+
+        \App\Models\ActivityLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'update_user',
+            'description' => "Super Admin memperbarui data user {$user->name} ({$changeDescription})",
+            'model_type' => User::class,
+            'model_id' => $user->id,
+        ]);
+
+        return back();
+    }
+
     public function destroy(Request $request, User $user)
     {
         if ($user->id === $request->user()->id) {

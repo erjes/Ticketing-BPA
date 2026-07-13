@@ -45,10 +45,24 @@ export default function Create({ categories }: { categories: string[] }) {
                     </CardHeader>
                     <CardContent className="p-6">
                         <form onSubmit={submit} className="flex flex-col gap-6">
-                            {/* Hidden category but visual indicator */}
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                                <span>Kategori yang dipilih:</span>
-                                <span className="px-2 py-1 bg-gray-100 rounded-md font-medium">{data.category || 'Belum dipilih'}</span>
+                            <div className="grid gap-2">
+                                <Label htmlFor="category" className="text-sm font-semibold text-gray-700">Kategori</Label>
+                                <Select 
+                                    value={data.category} 
+                                    onValueChange={(val) => setData('category', val)}
+                                >
+                                    <SelectTrigger id="category" className="border-gray-300 focus:ring-gray-300">
+                                        <SelectValue placeholder="Pilih Kategori" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {categories.map((cat) => (
+                                            <SelectItem key={cat} value={cat}>
+                                                {cat}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
                             </div>
                             
                             <div className="grid gap-2">
