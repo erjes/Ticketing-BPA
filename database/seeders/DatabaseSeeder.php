@@ -41,5 +41,9 @@ class DatabaseSeeder extends Seeder
             'prodi_unit' => 'S1 Sistem Informasi',
             'is_profile_complete' => true,
         ]);
+
+        $this->call([
+            TicketCategorySeeder::class,
+        ]);
     }
 }

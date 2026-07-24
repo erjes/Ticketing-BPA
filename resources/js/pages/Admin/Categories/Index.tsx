@@ -1,4 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
+import Swal from 'sweetalert2';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -53,92 +54,145 @@ export default function Index({ categories }: { categories: any[] }) {
     };
 
     const handleDelete = (id: number, name: string) => {
-        if (confirm(`Apakah Anda yakin ingin menghapus kategori "${name}"?`)) {
-            destroyCategory(destroy({ category: id }).url);
-        }
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Kategori "${name}" akan dihapus secara permanen beserta semua data tiket di dalamnya.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#8c1515',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                destroyCategory(destroy({ category: id }).url, {
+                    onStart: () => {
+                        Swal.fire({
+                            title: 'Menghapus Kategori',
+                            text: 'Mohon tunggu sebentar...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: `Kategori "${name}" telah berhasil dihapus.`,
+                            icon: 'success',
+                            confirmButtonColor: '#8c1515',
+                        });
+                    },
+                    onError: () => {
+                        Swal.fire({
+                            title: 'Gagal',
+                            text: 'Gagal menghapus kategori.',
+                            icon: 'error',
+                            confirmButtonColor: '#8c1515',
+                        });
+                    }
+                });
+            }
+        });
     };
 
     return (
         <>
             <Head title="Manajemen Kategori - Admin" />
-            <div className="flex flex-1 flex-col gap-6 p-6">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <div className="flex flex-1 flex-col gap-6 p-6 max-w-5xl mx-auto w-full">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                     <div>
-                        <h1 className="text-2xl font-bold">Manajemen Kategori</h1>
-                        <p className="text-muted-foreground mt-1">Atur opsi kategori untuk sistem ticketing.</p>
+                        <div className="flex items-center gap-2">
+                            <div className="w-1 h-5 bg-primary rounded-full"></div>
+                            <h1 className="text-2xl font-extrabold tracking-tight">Manajemen Kategori</h1>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1 font-medium">Atur opsi kategori untuk sistem ticketing.</p>
                     </div>
                     <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                         <DialogTrigger asChild>
-                            <Button className="w-full sm:w-auto">Tambah Kategori</Button>
+                            <Button className="w-full sm:w-auto rounded-xl px-6 font-bold shadow-md hover:shadow-lg transition-all bg-[#8c1515] hover:bg-[#7a1212] active:scale-[0.98]">
+                                Tambah Kategori
+                            </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="rounded-2xl sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle>Tambah Kategori Baru</DialogTitle>
+                                <DialogTitle className="text-xl font-bold">Tambah Kategori Baru</DialogTitle>
                             </DialogHeader>
-                            <form onSubmit={handleCreate} className="space-y-4">
+                            <form onSubmit={handleCreate} className="space-y-5 mt-4">
                                 <div className="space-y-2">
-                                    <Label>Nama Kategori</Label>
+                                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Nama Kategori</Label>
                                     <Input
                                         required
                                         value={createData.name}
                                         onChange={e => setCreateData('name', e.target.value)}
                                         placeholder="Contoh: IT Support"
+                                        className="rounded-xl h-11"
                                     />
-                                    {createErrors.name && <p className="text-sm text-red-500">{createErrors.name}</p>}
+                                    {createErrors.name && <p className="text-sm text-destructive font-medium">{createErrors.name}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Deskripsi</Label>
+                                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Deskripsi</Label>
                                     <Textarea
                                         value={createData.description}
                                         onChange={e => setCreateData('description', e.target.value)}
                                         placeholder="Penjelasan singkat kategori ini"
                                         rows={3}
+                                        className="rounded-xl resize-none"
                                     />
-                                    {createErrors.description && <p className="text-sm text-red-500">{createErrors.description}</p>}
+                                    {createErrors.description && <p className="text-sm text-destructive font-medium">{createErrors.description}</p>}
                                 </div>
-                                <DialogFooter>
-                                    <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>Batal</Button>
-                                    <Button type="submit" disabled={processingCreate}>Simpan</Button>
+                                <DialogFooter className="gap-2 pt-2">
+                                    <Button type="button" variant="outline" className="rounded-xl" onClick={() => setCreateOpen(false)}>Batal</Button>
+                                    <Button type="submit" disabled={processingCreate} className="rounded-xl bg-[#8c1515] hover:bg-[#7a1212]">Simpan</Button>
                                 </DialogFooter>
                             </form>
                         </DialogContent>
                     </Dialog>
                 </div>
 
-                <div className="rounded-md border bg-white overflow-hidden shadow-sm overflow-x-auto">
-                    <table className="w-full text-sm text-left min-w-[500px]">
-                        <thead className="bg-gray-50 border-b">
-                            <tr>
-                                <th className="px-4 py-3 font-semibold text-gray-700 w-16">No</th>
-                                <th className="px-4 py-3 font-semibold text-gray-700">Nama Kategori</th>
-                                <th className="px-4 py-3 font-semibold text-gray-700 w-48 text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                            {categories && categories.length > 0 ? categories.map((cat, idx) => (
-                                <tr key={cat.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-4 py-3">{idx + 1}</td>
-                                    <td className="px-4 py-3 font-medium">
-                                        <div>{cat.name}</div>
-                                        {cat.description && <div className="text-xs text-muted-foreground mt-1 font-normal">{cat.description}</div>}
-                                    </td>
-                                    <td className="px-4 py-3 text-right">
-                                        <div className="flex justify-end gap-2">
-                                            <Button variant="ghost" size="sm" onClick={() => openEdit(cat)}>Edit</Button>
-                                            <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => handleDelete(cat.id, cat.name)} disabled={processingDestroy}>Hapus</Button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )) : (
+                <Card className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left min-w-[600px]">
+                            <thead className="bg-muted/40 border-b border-border">
                                 <tr>
-                                    <td colSpan={3} className="px-4 py-8 text-center text-muted-foreground">
-                                        Tidak ada kategori.
-                                    </td>
+                                    <th className="px-6 py-4 font-bold text-muted-foreground uppercase text-[10px] tracking-wider w-16">No</th>
+                                    <th className="px-6 py-4 font-bold text-muted-foreground uppercase text-[10px] tracking-wider">Nama Kategori & Deskripsi</th>
+                                    <th className="px-6 py-4 font-bold text-muted-foreground uppercase text-[10px] tracking-wider w-48 text-right">Aksi</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                                {categories && categories.length > 0 ? categories.map((cat, idx) => (
+                                    <tr key={cat.id} className="hover:bg-muted/40 transition-colors">
+                                        <td className="px-6 py-4 font-mono font-bold text-muted-foreground">{idx + 1}</td>
+                                        <td className="px-6 py-4">
+                                            <div className="font-bold text-foreground text-sm">{cat.name}</div>
+                                            {cat.description && <div className="text-xs text-muted-foreground mt-1 font-medium leading-relaxed max-w-lg">{cat.description}</div>}
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex justify-end gap-2">
+                                                <Button variant="ghost" size="sm" className="rounded-lg text-primary hover:bg-primary/10 hover:text-primary transition-colors text-xs font-bold" onClick={() => openEdit(cat)}>Edit</Button>
+                                                <Button variant="ghost" size="sm" className="rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors text-xs font-bold" onClick={() => handleDelete(cat.id, cat.name)} disabled={processingDestroy}>Hapus</Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )) : (
+                                    <tr>
+                                        <td colSpan={3} className="px-6 py-12 text-center text-muted-foreground">
+                                            <div className="flex flex-col items-center justify-center gap-2">
+                                                <div className="bg-muted p-3 rounded-full text-muted-foreground/60">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+                                                </div>
+                                                <p className="text-sm font-semibold mt-2">Tidak Ada Kategori</p>
+                                                <p className="text-xs text-muted-foreground">Silakan tambah kategori baru untuk sistem tiket.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </Card>
 
                 {/* Edit Dialog */}
                 <Dialog open={!!editCategory} onOpenChange={(open) => !open && setEditCategory(null)}>

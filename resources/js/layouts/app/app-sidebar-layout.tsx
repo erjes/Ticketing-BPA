@@ -11,9 +11,11 @@ export default function AppSidebarLayout({
     return (
         <AppShell variant="sidebar">
             <AppSidebar />
-            <AppContent variant="sidebar" className="overflow-x-hidden">
+            <AppContent variant="sidebar" className="overflow-x-hidden flex flex-col min-h-screen">
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
-                {children}
+                <div className="flex-1 animate-fade-in flex flex-col">
+                    {children}
+                </div>
             </AppContent>
         </AppShell>
     );

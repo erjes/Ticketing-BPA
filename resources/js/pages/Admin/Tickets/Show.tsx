@@ -1,4 +1,5 @@
 import { Head, useForm, Link, usePage, router } from '@inertiajs/react';
+import Swal from 'sweetalert2';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,9 +62,47 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
     };
 
     const handleDelete = () => {
-        if (confirm('Apakah Anda yakin ingin menghapus ticket ini? Tindakan ini tidak dapat dibatalkan.')) {
-            destroyTicket(`/admin/tickets/${ticket.ticket_number}`);
-        }
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: 'Tiket ini akan dihapus secara permanen dari sistem beserta seluruh lampiran dan riwayat komentar.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#8c1515',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                destroyTicket(`/admin/tickets/${ticket.ticket_number}`, {
+                    onStart: () => {
+                        Swal.fire({
+                            title: 'Menghapus Tiket',
+                            text: 'Mohon tunggu sebentar...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'Tiket bantuan telah berhasil dihapus.',
+                            icon: 'success',
+                            confirmButtonColor: '#8c1515',
+                        });
+                    },
+                    onError: () => {
+                        Swal.fire({
+                            title: 'Gagal',
+                            text: 'Gagal menghapus tiket bantuan.',
+                            icon: 'error',
+                            confirmButtonColor: '#8c1515',
+                        });
+                    }
+                });
+            }
+        });
     };
 
     return (
@@ -148,29 +187,136 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2 flex flex-col gap-6">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Detail pertanyaan</CardTitle>
+                        <Card className="rounded-2xl shadow-sm border border-border hover:border-primary/10 transition-all duration-300">
+                            <CardHeader className="bg-muted/10 border-b border-border p-6 rounded-t-2xl">
+                                <CardTitle className="text-lg font-bold text-foreground">Detail Pertanyaan & Informasi Tiket</CardTitle>
                             </CardHeader>
-                            <CardContent className="flex flex-col gap-2">
-                                <p><span className="text-muted-foreground">Kategori:</span> {ticket.category}</p>
-                                <p><span className="text-muted-foreground">Subject:</span> <span className="font-semibold">{ticket.subject}</span></p>
-                                <p><span className="text-muted-foreground">Dibuat:</span> {new Date(ticket.created_at).toLocaleString()}</p>
-                                <div className="mt-4 p-4 bg-muted rounded-md text-base prose prose-sm max-w-none">
-                                    <ReactMarkdown>{ticket.description}</ReactMarkdown>
+                            <CardContent className="p-6 flex flex-col gap-6">
+                                
+                                {/* Structured Grid for Metadata */}
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-muted/30 p-5 rounded-2xl border border-border/80 shadow-xs">
+                                    <div>
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Kategori Layanan</span>
+                                        <p className="font-semibold text-sm text-foreground mt-1.5">{ticket.category}</p>
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Nomor Tiket</span>
+                                        <p className="font-mono font-bold text-sm text-primary mt-1.5">{ticket.ticket_number}</p>
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Waktu Pembuatan</span>
+                                        <p className="font-semibold text-sm text-foreground mt-1.5">
+                                            {new Date(ticket.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+                                        </p>
+                                    </div>
                                 </div>
+
+                                {/* Custom Form Display / General Description */}
+                                <div className="space-y-4">
+                                    {ticket.category === 'Data & Informasi Kurikulum' ? (
+                                        <div className="space-y-5">
+                                            <div className="bg-muted/10 p-5 rounded-2xl border border-border">
+                                                <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-wider">Detail Data (Prodi, Angkatan, Tahun Ajaran)</h4>
+                                                <p className="mt-2.5 text-sm text-foreground whitespace-pre-wrap leading-relaxed font-medium">{ticket.detail_data}</p>
+                                            </div>
+                                            {ticket.link_format_data && (
+                                                <div className="bg-muted/10 p-5 rounded-2xl border border-border">
+                                                    <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-wider">Link Format Data</h4>
+                                                    <p className="mt-2.5 text-sm">
+                                                        <a href={ticket.link_format_data} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-700 hover:underline font-semibold break-all">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                                            Buka Dokumen Format Data
+                                                        </a>
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : ticket.category === 'Monitoring & Evaluasi OBE' ? (
+                                        <div className="bg-muted/10 p-5 rounded-2xl border border-border">
+                                            <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-wider">Detail Pertanyaan, Kendala & Tujuan Keperluan</h4>
+                                            <p className="mt-2.5 text-sm text-foreground whitespace-pre-wrap leading-relaxed font-medium">{ticket.detail_tujuan}</p>
+                                        </div>
+                                    ) : ticket.category === 'Pengelolaan Kurikulum & Mata Kuliah' ? (
+                                        <div className="bg-muted/10 p-5 rounded-2xl border border-border">
+                                            <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-wider">Detail Pertanyaan, Dokumen & Latar Belakang/Tujuan Keperluan</h4>
+                                            <p className="mt-2.5 text-sm text-foreground whitespace-pre-wrap leading-relaxed font-medium">{ticket.detail_dokumen_tujuan}</p>
+                                        </div>
+                                    ) : ticket.category === 'Setting RPS & Komponennya' ? (
+                                        <div className="space-y-5">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="bg-muted/10 p-5 rounded-2xl border border-border">
+                                                    <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-wider">Posisi yang Mengajukan</h4>
+                                                    <p className="mt-2.5 text-sm text-foreground font-semibold">{ticket.posisi_pengaju}</p>
+                                                </div>
+                                                {ticket.sudah_koordinasi && (
+                                                    <div className="bg-muted/10 p-5 rounded-2xl border border-border">
+                                                        <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-wider">Koordinasi dengan Koordinator MK</h4>
+                                                        <p className="mt-2.5 text-sm text-foreground font-semibold">
+                                                            {ticket.sudah_koordinasi === 'Ya' ? '✅ Sudah Koordinasi' : '❌ Belum Koordinasi'}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="bg-muted/10 p-5 rounded-2xl border border-border">
+                                                <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-wider">Detail Pertanyaan</h4>
+                                                <p className="mt-2.5 text-sm text-foreground whitespace-pre-wrap leading-relaxed font-medium">{ticket.detail_pertanyaan}</p>
+                                            </div>
+                                            <div className="bg-muted/10 p-5 rounded-2xl border border-border">
+                                                <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-wider">Alasan Mengajukan Setting</h4>
+                                                <p className="mt-2.5 text-sm text-foreground whitespace-pre-wrap leading-relaxed font-medium">{ticket.alasan_setting}</p>
+                                            </div>
+                                        </div>
+                                    ) : ticket.category === 'Verifikasi & Dispensasi Akademik' ? (
+                                        <div className="space-y-5">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="bg-muted/10 p-5 rounded-2xl border border-border">
+                                                    <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-wider">Batas Waktu Permintaan</h4>
+                                                    <p className="mt-2.5 text-sm text-foreground font-semibold">
+                                                        {new Date(ticket.batas_waktu).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+                                                    </p>
+                                                </div>
+                                                {ticket.upload_link_persyaratan && (
+                                                    <div className="bg-muted/10 p-5 rounded-2xl border border-border">
+                                                        <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-wider">Link/Daftar Data Sesuai Persyaratan</h4>
+                                                        <p className="mt-2.5 text-sm">
+                                                            {ticket.upload_link_persyaratan.startsWith('http') ? (
+                                                                <a href={ticket.upload_link_persyaratan} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-700 hover:underline font-semibold break-all">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                                                    Buka Tautan Persyaratan
+                                                                </a>
+                                                            ) : (
+                                                                <span className="text-foreground font-semibold">{ticket.upload_link_persyaratan}</span>
+                                                            )}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="bg-muted/10 p-5 rounded-2xl border border-border">
+                                                <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-wider">Detail Pertanyaan</h4>
+                                                <p className="mt-2.5 text-sm text-foreground whitespace-pre-wrap leading-relaxed font-medium">{ticket.detail_pertanyaan}</p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="p-5 bg-muted/30 rounded-2xl border border-border prose dark:prose-invert max-w-none">
+                                            <ReactMarkdown>{ticket.description}</ReactMarkdown>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Attachments */}
                                 {ticket.attachments && ticket.attachments.filter((f: any) => !f.ticket_reply_id).length > 0 && (
-                                    <div className="mt-4 border-t pt-4">
-                                        <h4 className="text-sm font-semibold mb-2">Lampiran Tiket:</h4>
-                                        <div className="flex flex-wrap gap-2">
+                                    <div className="mt-2 border-t pt-6 border-border">
+                                        <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Lampiran Dokumen Utama</h4>
+                                        <div className="flex flex-wrap gap-3">
                                             {ticket.attachments.filter((f: any) => !f.ticket_reply_id).map((file: any) => (
                                                 <button 
                                                     key={file.id} 
                                                     onClick={() => setPreviewFile(file)}
-                                                    className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded px-3 py-2 text-sm text-blue-600 transition-colors"
+                                                    className="inline-flex items-center gap-2 bg-white dark:bg-card hover:bg-muted border border-border rounded-xl px-4 py-2.5 text-sm font-semibold text-primary transition-all shadow-sm hover:scale-[1.01] active:scale-[0.99]"
                                                 >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                                                     {file.file_name}
+                                                    <span className="text-[10px] text-muted-foreground">({(file.file_size / (1024 * 1024)).toFixed(2)} MB)</span>
                                                 </button>
                                             ))}
                                         </div>
@@ -180,32 +326,40 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                         </Card>
 
                         {ticket.replies && ticket.replies.length > 0 && (
-                            <div className="flex flex-col gap-4">
-                                <h3 className="text-lg font-semibold">Riwayat Percakapan</h3>
+                            <div className="flex flex-col gap-4 mt-2">
+                                <h3 className="text-lg font-bold text-foreground">Riwayat Percakapan</h3>
                                 {ticket.replies.map((reply: any) => (
-                                    <Card key={reply.id} className={
-                                        reply.is_internal ? 'border-yellow-200 bg-yellow-50/50' :
-                                            (reply.user_id === ticket.user_id ? 'border-primary/20 bg-primary/5' : '')
-                                    }>
-                                        <CardContent className="p-4 flex flex-col gap-2">
-                                            <div className="flex justify-between text-sm text-muted-foreground">
-                                                <span className="font-semibold text-foreground">
-                                                    {reply.user?.name} {reply.is_internal ? '(Catatan Internal)' : (reply.user?.is_admin ? '(Admin)' : '')}
-                                                </span>
-                                                <span>{new Date(reply.created_at).toLocaleString()}</span>
+                                    <Card key={reply.id} className={`rounded-2xl transition-colors ${
+                                        reply.is_internal ? 'border-amber-200 bg-amber-50/50 shadow-sm' :
+                                            (reply.user_id === ticket.user_id ? 'border-primary/20 bg-primary/5 shadow-sm' : 'border-border bg-card shadow-xs')
+                                    }`}>
+                                        <CardContent className="p-5 flex flex-col gap-3">
+                                            <div className="flex justify-between items-center text-sm text-muted-foreground border-b border-border/50 pb-3">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${
+                                                        reply.is_internal ? 'bg-amber-600 text-white' : 
+                                                        (reply.user_id === ticket.user_id ? 'bg-muted text-foreground' : 'bg-[#8c1515] text-white')
+                                                    }`}>
+                                                        {reply.user?.name.charAt(0)}
+                                                    </div>
+                                                    <span className="font-bold text-foreground">
+                                                        {reply.user?.name} {reply.is_internal ? <span className="ml-1 text-[10px] uppercase tracking-wider bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-md">Catatan Internal</span> : (reply.user?.is_admin ? <span className="ml-1 text-[10px] uppercase tracking-wider bg-primary/10 text-primary px-1.5 py-0.5 rounded-md">Admin</span> : '')}
+                                                    </span>
+                                                </div>
+                                                <span className="text-xs font-medium bg-muted/50 px-2 py-1 rounded-md">{new Date(reply.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</span>
                                             </div>
-                                            <div className="mt-2 prose prose-sm max-w-none">
+                                            <div className="mt-1 prose prose-sm dark:prose-invert max-w-none text-foreground/90 font-medium">
                                                 <ReactMarkdown>{reply.message}</ReactMarkdown>
                                             </div>
                                             {reply.attachments && reply.attachments.length > 0 && (
-                                                <div className="mt-3 pt-3 border-t border-gray-200/50">
-                                                    <h5 className="text-xs font-semibold mb-2 text-gray-500 uppercase tracking-wider">Lampiran:</h5>
+                                                <div className="mt-3 pt-3 border-t border-border/50">
+                                                    <h5 className="text-xs font-bold mb-2 text-muted-foreground uppercase tracking-wider">Lampiran:</h5>
                                                     <div className="flex flex-wrap gap-2">
                                                         {reply.attachments.map((file: any) => (
                                                             <button 
                                                                 key={file.id} 
                                                                 onClick={() => setPreviewFile(file)}
-                                                                className="flex items-center gap-1.5 bg-white/60 hover:bg-white border border-gray-200 rounded px-2.5 py-1.5 text-xs text-blue-600 transition-colors shadow-sm"
+                                                                className="flex items-center gap-1.5 bg-white/80 dark:bg-card hover:bg-muted border border-border rounded-lg px-3 py-1.5 text-xs text-primary transition-all shadow-xs hover:scale-[1.02]"
                                                             >
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                                                                 {file.file_name}
@@ -220,29 +374,36 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                             </div>
                         )}
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Kirim Balasan / Catatan Internal</CardTitle>
+                        <Card className="rounded-2xl shadow-sm border border-border mt-2">
+                            <CardHeader className="bg-muted/10 border-b border-border p-6 rounded-t-2xl">
+                                <CardTitle className="text-lg font-bold text-foreground">Kirim Balasan / Catatan Internal</CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <form onSubmit={sendReply} className="flex flex-col gap-4">
+                            <CardContent className="p-6">
+                                <form onSubmit={sendReply} className="flex flex-col gap-5">
                                     <div className="grid gap-2">
-                                        <SimpleMdeReact 
-                                            value={replyData.message} 
-                                            onChange={(val) => setReplyData('message', val)}
-                                            options={{
-                                                spellChecker: false,
-                                                status: ['lines', 'words'],
-                                                placeholder: "Ketik pesan balasan...",
-                                            }}
-                                        />
-                                        {replyErrors.message && <p className="text-sm text-destructive">{replyErrors.message}</p>}
+                                        <div className="rounded-xl overflow-hidden border border-border bg-card">
+                                            <SimpleMdeReact 
+                                                value={replyData.message} 
+                                                onChange={(val) => setReplyData('message', val)}
+                                                options={{
+                                                    spellChecker: false,
+                                                    status: ['lines', 'words'],
+                                                    placeholder: "Ketik pesan balasan...",
+                                                }}
+                                            />
+                                        </div>
+                                        {replyErrors.message && <p className="text-sm text-destructive font-medium mt-1">{replyErrors.message}</p>}
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <label className="flex items-center gap-2 border border-gray-300 rounded-md p-3 cursor-pointer hover:bg-gray-50 transition-colors">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                                            <span className="text-sm text-gray-600 font-medium">Tambahkan Lampiran...</span>
+                                        <label className="flex items-center gap-3 border border-dashed border-border rounded-xl p-4 cursor-pointer hover:bg-muted/50 hover:border-primary/40 transition-all bg-card group">
+                                            <div className="bg-muted p-2 rounded-lg text-muted-foreground group-hover:text-primary group-hover:bg-primary/5 transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                                            </div>
+                                            <div className="flex flex-col text-left">
+                                                <span className="text-sm text-foreground font-semibold group-hover:text-primary transition-colors">Tambahkan Dokumen Lampiran</span>
+                                                <span className="text-xs text-muted-foreground mt-0.5">Mendukung multi-upload (Maks: 2GB per berkas)</span>
+                                            </div>
                                             <input 
                                                 type="file" 
                                                 multiple 
@@ -256,33 +417,36 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                                             />
                                         </label>
                                         {replyData.attachments.length > 0 && (
-                                            <div className="flex flex-wrap gap-2 mt-2">
+                                            <div className="flex flex-wrap items-center gap-2 mt-2">
                                                 {replyData.attachments.map((file, i) => (
-                                                    <span key={i} className="text-xs bg-gray-100 px-2 py-1 rounded border">
+                                                    <span key={i} className="inline-flex items-center gap-1.5 text-xs font-medium bg-primary/5 text-primary px-3 py-1.5 rounded-lg border border-primary/10">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                                                         {file.name}
                                                     </span>
                                                 ))}
                                                 <button 
                                                     type="button" 
                                                     onClick={() => setReplyData('attachments', [])}
-                                                    className="text-xs text-red-500 hover:underline"
+                                                    className="text-xs font-bold text-destructive hover:underline ml-2"
                                                 >
                                                     Hapus Semua
                                                 </button>
                                             </div>
                                         )}
                                     </div>
-                                    <div className="flex justify-between items-center">
-                                        <label className="flex items-center gap-2 cursor-pointer">
+                                    <div className="flex justify-between items-center mt-2 p-3 bg-muted/40 rounded-xl border border-border">
+                                        <label className="flex items-center gap-3 cursor-pointer">
                                             <input
                                                 type="checkbox"
                                                 checked={replyData.is_internal}
                                                 onChange={e => setReplyData('is_internal', e.target.checked)}
-                                                className="w-4 h-4 rounded border-gray-300"
+                                                className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20"
                                             />
-                                            <span className="text-sm font-medium">Tandai sebagai Catatan Internal (User tidak bisa melihat ini)</span>
+                                            <span className="text-sm font-semibold text-foreground">Tandai sebagai Catatan Internal <span className="text-muted-foreground font-normal">(User tidak bisa melihat ini)</span></span>
                                         </label>
-                                        <Button type="submit" disabled={processingReply}>Kirim Pesan</Button>
+                                        <Button type="submit" disabled={processingReply} className="bg-[#8c1515] hover:bg-[#7a1212] text-white rounded-xl h-10 px-6 font-bold shadow-md transition-all active:scale-[0.98]">
+                                            Kirim Pesan
+                                        </Button>
                                     </div>
                                 </form>
                             </CardContent>
@@ -291,29 +455,29 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
 
                     <div>
                         {ticket.rating !== null && (
-                            <Card className="mb-4 border-yellow-200 bg-yellow-50/30">
-                                <CardHeader className="pb-3">
-                                    <CardTitle className="text-base font-semibold text-yellow-800">Ulasan Kepuasan Pengguna</CardTitle>
+                            <Card className="mb-4 border-amber-200 bg-amber-50/50 rounded-2xl shadow-sm">
+                                <CardHeader className="pb-3 bg-amber-100/50 border-b border-amber-200/50 rounded-t-2xl">
+                                    <CardTitle className="text-base font-bold text-amber-900">Ulasan Kepuasan Pengguna</CardTitle>
                                 </CardHeader>
-                                <CardContent className="flex flex-col gap-3 text-sm">
+                                <CardContent className="flex flex-col gap-3 p-5">
                                     <div className="flex items-center gap-1">
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <svg
                                                 key={star}
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 viewBox="0 0 24 24"
-                                                fill={ticket.rating >= star ? '#eab308' : 'none'}
-                                                stroke="#eab308"
-                                                strokeWidth="2"
-                                                className="w-5 h-5"
+                                                fill={ticket.rating >= star ? '#f59e0b' : 'none'}
+                                                stroke="#f59e0b"
+                                                strokeWidth="2.5"
+                                                className="w-5 h-5 drop-shadow-sm"
                                             >
                                                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                                             </svg>
                                         ))}
-                                        <span className="ml-2 font-semibold text-muted-foreground">{ticket.rating} / 5</span>
+                                        <span className="ml-2 font-bold text-amber-900 bg-amber-200/50 px-2 py-0.5 rounded-md text-xs">{ticket.rating} / 5</span>
                                     </div>
                                     {ticket.feedback && (
-                                        <div className="p-3 bg-white rounded border text-xs text-gray-700 italic">
+                                        <div className="p-3 bg-white/80 rounded-xl border border-amber-200/60 text-sm text-amber-950 font-medium">
                                             "{ticket.feedback}"
                                         </div>
                                     )}
@@ -321,51 +485,55 @@ export default function Show({ ticket, categories }: { ticket: any, categories: 
                             </Card>
                         )}
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Informasi Pengirim</CardTitle>
+                        <Card className="rounded-2xl shadow-sm border border-border">
+                            <CardHeader className="bg-muted/10 border-b border-border p-5 rounded-t-2xl">
+                                <CardTitle className="text-base font-bold text-foreground">Informasi Pengirim</CardTitle>
                             </CardHeader>
-                            <CardContent className="flex flex-col gap-3 text-sm">
+                            <CardContent className="flex flex-col gap-4 p-5">
                                 <div>
-                                    <span className="text-muted-foreground block">Nama Lengkap</span>
-                                    <span className="font-medium">{ticket.user?.name}</span>
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Nama Lengkap</span>
+                                    <span className="font-semibold text-sm text-foreground">{ticket.user?.name}</span>
                                 </div>
                                 <div>
-                                    <span className="text-muted-foreground block">Email</span>
-                                    <span className="font-medium">{ticket.user?.email}</span>
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Email</span>
+                                    <span className="font-semibold text-sm text-foreground break-all">{ticket.user?.email}</span>
                                 </div>
                                 <div>
-                                    <span className="text-muted-foreground block">NIM/NIP</span>
-                                    <span className="font-medium">{ticket.user?.nim_nip}</span>
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">NIM/NIP</span>
+                                    <span className="font-semibold text-sm text-foreground">{ticket.user?.nim_nip}</span>
                                 </div>
                                 <div>
-                                    <span className="text-muted-foreground block">Status</span>
-                                    <span className="font-medium">{ticket.user?.status}</span>
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Status</span>
+                                    <span className="font-semibold text-sm text-foreground">{ticket.user?.status}</span>
                                 </div>
                                 <div>
-                                    <span className="text-muted-foreground block">Prodi/Unit</span>
-                                    <span className="font-medium">{ticket.user?.prodi_unit}</span>
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Prodi/Unit</span>
+                                    <span className="font-semibold text-sm text-foreground">{ticket.user?.prodi_unit}</span>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card className="mt-4">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base font-semibold">Penanggung Jawab</CardTitle>
+                        <Card className="mt-4 rounded-2xl shadow-sm border border-border sticky top-24">
+                            <CardHeader className="bg-muted/10 border-b border-border p-5 rounded-t-2xl">
+                                <CardTitle className="text-base font-bold text-foreground">Penanggung Jawab</CardTitle>
                             </CardHeader>
-                            <CardContent className="flex flex-col gap-3 text-sm">
+                            <CardContent className="flex flex-col gap-3 p-5">
                                 {ticket.admin ? (
                                     <div>
-                                        <span className="text-muted-foreground block text-xs">Ditugaskan Kepada</span>
-                                        <span className="font-semibold text-foreground">{ticket.admin.name}</span>
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Ditugaskan Kepada</span>
+                                        <div className="flex items-center gap-2 mt-1.5">
+                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-xs">
+                                                {ticket.admin.name.charAt(0)}
+                                            </div>
+                                            <span className="font-bold text-sm text-foreground">{ticket.admin.name}</span>
+                                        </div>
                                     </div>
                                 ) : (
-                                    <div className="flex flex-col gap-2">
-                                        <span className="text-muted-foreground italic text-xs">Belum ada admin yang ditugaskan.</span>
+                                    <div className="flex flex-col gap-3">
+                                        <span className="text-muted-foreground font-medium text-xs bg-muted/50 p-2.5 rounded-lg border border-border">Belum ada admin yang ditugaskan.</span>
                                         <Button
                                             onClick={() => router.post(`/admin/tickets/${ticket.ticket_number}/claim`, {}, { preserveScroll: true })}
-                                            className="w-full bg-[#8b1a1a] hover:bg-[#7a1212] text-white text-xs font-semibold py-1.5"
-                                            size="sm"
+                                            className="w-full bg-[#8c1515] hover:bg-[#7a1212] text-white text-sm font-bold py-2 h-10 rounded-xl transition-all shadow-md active:scale-[0.98]"
                                         >
                                             Klaim Tiket Ini
                                         </Button>

@@ -1,4 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
+import Swal from 'sweetalert2';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -59,131 +60,182 @@ export default function Index({ faqs, categories }: { faqs: any[], categories: s
     };
 
     const handleDelete = (id: number) => {
-        if (confirm('Apakah Anda yakin ingin menghapus FAQ ini?')) {
-            destroyFaq(`/admin/faqs/${id}`);
-        }
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: 'FAQ ini akan dihapus secara permanen dari daftar tanya-jawab umum.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#8c1515',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                destroyFaq(`/admin/faqs/${id}`, {
+                    onStart: () => {
+                        Swal.fire({
+                            title: 'Menghapus FAQ',
+                            text: 'Mohon tunggu sebentar...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'FAQ telah berhasil dihapus.',
+                            icon: 'success',
+                            confirmButtonColor: '#8c1515',
+                        });
+                    },
+                    onError: () => {
+                        Swal.fire({
+                            title: 'Gagal',
+                            text: 'Gagal menghapus FAQ.',
+                            icon: 'error',
+                            confirmButtonColor: '#8c1515',
+                        });
+                    }
+                });
+            }
+        });
     };
 
     return (
         <>
             <Head title="Manajemen FAQ - Admin" />
-            <div className="flex flex-1 flex-col gap-6 p-6">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <div className="flex flex-1 flex-col gap-6 p-6 max-w-6xl mx-auto w-full">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                     <div>
-                        <h1 className="text-2xl font-bold">Manajemen FAQ</h1>
-                        <p className="text-muted-foreground mt-1">Kelola pertanyaan umum (FAQ) bantuan untuk User.</p>
+                        <div className="flex items-center gap-2">
+                            <div className="w-1 h-5 bg-primary rounded-full"></div>
+                            <h1 className="text-2xl font-extrabold tracking-tight">Manajemen FAQ</h1>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1 font-medium">Kelola pertanyaan umum (FAQ) bantuan untuk User.</p>
                     </div>
                     <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                         <DialogTrigger asChild>
-                            <Button className="w-full sm:w-auto">Tambah FAQ</Button>
+                            <Button className="w-full sm:w-auto rounded-xl px-6 font-bold shadow-md hover:shadow-lg transition-all bg-[#8c1515] hover:bg-[#7a1212] active:scale-[0.98]">
+                                Tambah FAQ
+                            </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-lg">
+                        <DialogContent className="rounded-2xl sm:max-w-xl">
                             <DialogHeader>
-                                <DialogTitle>Tambah FAQ Baru</DialogTitle>
+                                <DialogTitle className="text-xl font-bold">Tambah FAQ Baru</DialogTitle>
                             </DialogHeader>
-                            <form onSubmit={handleCreate} className="space-y-4">
+                            <form onSubmit={handleCreate} className="space-y-5 mt-4">
                                 <div className="space-y-2">
-                                    <Label>Pertanyaan</Label>
+                                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Pertanyaan</Label>
                                     <Input
                                         required
                                         value={createData.question}
                                         onChange={e => setCreateData('question', e.target.value)}
                                         placeholder="Contoh: Bagaimana cara reset password?"
+                                        className="rounded-xl h-11"
                                     />
-                                    {createErrors.question && <p className="text-sm text-red-500">{createErrors.question}</p>}
+                                    {createErrors.question && <p className="text-sm text-destructive font-medium">{createErrors.question}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Kategori Tiket Terkait (Opsional)</Label>
+                                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Kategori Tiket Terkait (Opsional)</Label>
                                     <Select value={createData.category} onValueChange={v => setCreateData('category', v)}>
-                                        <SelectTrigger className="bg-white">
+                                        <SelectTrigger className="bg-card rounded-xl h-11">
                                             <SelectValue placeholder="Pilih Kategori..." />
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent className="rounded-xl">
                                             {categories.map(c => (
                                                 <SelectItem key={c} value={c}>{c}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    {createErrors.category && <p className="text-sm text-red-500">{createErrors.category}</p>}
+                                    {createErrors.category && <p className="text-sm text-destructive font-medium">{createErrors.category}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Jawaban</Label>
+                                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Jawaban</Label>
                                     <Textarea
                                         required
                                         value={createData.answer}
                                         onChange={e => setCreateData('answer', e.target.value)}
                                         placeholder="Tuliskan jawaban penjelasan di sini..."
                                         rows={6}
+                                        className="rounded-xl resize-none"
                                     />
-                                    {createErrors.answer && <p className="text-sm text-red-500">{createErrors.answer}</p>}
+                                    {createErrors.answer && <p className="text-sm text-destructive font-medium">{createErrors.answer}</p>}
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-3 bg-muted/40 p-3 rounded-xl border border-border">
                                     <input
                                         type="checkbox"
                                         id="is_published"
                                         checked={createData.is_published}
                                         onChange={e => setCreateData('is_published', e.target.checked)}
-                                        className="w-4 h-4 rounded border-gray-300"
+                                        className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20"
                                     />
-                                    <Label htmlFor="is_published" className="cursor-pointer">Terbitkan FAQ langsung</Label>
+                                    <Label htmlFor="is_published" className="cursor-pointer text-sm font-semibold text-foreground">Terbitkan FAQ langsung</Label>
                                 </div>
-                                <DialogFooter>
-                                    <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>Batal</Button>
-                                    <Button type="submit" disabled={processingCreate}>Simpan</Button>
+                                <DialogFooter className="gap-2 pt-2">
+                                    <Button type="button" variant="outline" className="rounded-xl" onClick={() => setCreateOpen(false)}>Batal</Button>
+                                    <Button type="submit" disabled={processingCreate} className="rounded-xl bg-[#8c1515] hover:bg-[#7a1212]">Simpan</Button>
                                 </DialogFooter>
                             </form>
                         </DialogContent>
                     </Dialog>
                 </div>
 
-                <div className="rounded-md border bg-white overflow-hidden shadow-sm">
+                <Card className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-gray-50 border-b border-gray-200">
+                        <table className="w-full text-sm text-left min-w-[800px]">
+                            <thead className="bg-muted/40 border-b border-border">
                             <tr>
-                                <th className="px-4 py-3 font-semibold text-gray-700 w-16">No</th>
-                                <th className="px-4 py-3 font-semibold text-gray-700">Pertanyaan & Jawaban</th>
-                                <th className="px-4 py-3 font-semibold text-gray-700">Kategori</th>
-                                <th className="px-4 py-3 font-semibold text-gray-700 w-32">Status</th>
-                                <th className="px-4 py-3 font-semibold text-gray-700 w-48 text-right">Aksi</th>
+                                <th className="px-6 py-4 font-bold text-muted-foreground uppercase text-[10px] tracking-wider w-16">No</th>
+                                <th className="px-6 py-4 font-bold text-muted-foreground uppercase text-[10px] tracking-wider">Pertanyaan & Jawaban</th>
+                                <th className="px-6 py-4 font-bold text-muted-foreground uppercase text-[10px] tracking-wider w-48">Kategori</th>
+                                <th className="px-6 py-4 font-bold text-muted-foreground uppercase text-[10px] tracking-wider w-32">Status</th>
+                                <th className="px-6 py-4 font-bold text-muted-foreground uppercase text-[10px] tracking-wider w-40 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y">
+                        <tbody className="divide-y divide-border">
                             {faqs && faqs.length > 0 ? faqs.map((faq, idx) => (
-                                <tr key={faq.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-4 py-3">{idx + 1}</td>
-                                    <td className="px-4 py-3">
-                                        <div className="font-semibold text-gray-900">{faq.question}</div>
-                                        <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{faq.answer}</div>
+                                <tr key={faq.id} className="hover:bg-muted/40 transition-colors">
+                                    <td className="px-6 py-4 font-mono font-bold text-muted-foreground">{idx + 1}</td>
+                                    <td className="px-6 py-4">
+                                        <div className="font-bold text-foreground text-sm">{faq.question}</div>
+                                        <div className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed max-w-xl font-medium">{faq.answer}</div>
                                     </td>
-                                    <td className="px-4 py-3">
-                                        <span className="px-2 py-0.5 bg-gray-100 rounded text-xs font-medium">
+                                    <td className="px-6 py-4">
+                                        <span className="inline-flex px-2.5 py-1 bg-muted/50 border border-border rounded-lg text-xs font-semibold text-foreground">
                                             {faq.category || 'Umum'}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3">
-                                        <span className={`px-2 py-0.5 rounded text-xs font-semibold ${faq.is_published ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                    <td className="px-6 py-4">
+                                        <span className={`inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${faq.is_published ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-gray-100 text-gray-700 border border-gray-200'}`}>
                                             {faq.is_published ? 'Published' : 'Draft'}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3 text-right">
+                                    <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2">
-                                            <Button variant="ghost" size="sm" onClick={() => openEdit(faq)}>Edit</Button>
-                                            <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => handleDelete(faq.id)} disabled={processingDestroy}>Hapus</Button>
+                                            <Button variant="ghost" size="sm" className="rounded-lg text-primary hover:bg-primary/10 hover:text-primary transition-colors text-xs font-bold" onClick={() => openEdit(faq)}>Edit</Button>
+                                            <Button variant="ghost" size="sm" className="rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors text-xs font-bold" onClick={() => handleDelete(faq.id)} disabled={processingDestroy}>Hapus</Button>
                                         </div>
                                     </td>
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                                        Tidak ada FAQ.
+                                    <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <div className="bg-muted p-3 rounded-full text-muted-foreground/60">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                            </div>
+                                            <p className="text-sm font-semibold mt-2">Tidak Ada FAQ</p>
+                                            <p className="text-xs text-muted-foreground">Silakan tambah FAQ baru untuk membantu pengguna.</p>
+                                        </div>
                                     </td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
                     </div>
-                </div>
+                </Card>
 
                 {/* Edit Dialog */}
                 <Dialog open={!!editFaq} onOpenChange={(open) => !open && setEditFaq(null)}>

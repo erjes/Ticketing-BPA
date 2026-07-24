@@ -99,10 +99,10 @@ export function AppSidebar() {
 
     return (
         <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
+            <SidebarHeader className="border-b border-border/50 py-4.5 px-4 transition-all duration-200 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:py-2">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
+                        <SidebarMenuButton size="lg" asChild className="hover:bg-transparent active:scale-100!">
                             <Link href={defaultDashboardUrl} prefetch>
                                 <AppLogo />
                             </Link>

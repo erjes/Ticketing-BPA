@@ -54,25 +54,72 @@ class TicketController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $rules = [
             'category' => 'required|string',
             'subject' => 'required|string|max:255',
-            'description' => 'required|string',
             'attachments.*' => 'nullable|file|mimes:jpg,gif,jpeg,png,pdf,doc,docx,zip|max:2048000', // max 2GB
-        ]);
+        ];
 
-        $ticket = DB::transaction(function () use ($request) {
+        $category = $request->input('category');
+        if ($category === 'Data & Informasi Kurikulum') {
+            $rules['detail_data'] = 'required|string';
+            $rules['link_format_data'] = 'required|url';
+        } elseif ($category === 'Monitoring & Evaluasi OBE') {
+            $rules['detail_tujuan'] = 'required|string';
+        } elseif ($category === 'Pengelolaan Kurikulum & Mata Kuliah') {
+            $rules['detail_dokumen_tujuan'] = 'required|string';
+        } elseif ($category === 'Setting RPS & Komponennya') {
+            $rules['detail_pertanyaan'] = 'required|string';
+            $rules['posisi_pengaju'] = 'required|string|in:Kaprodi,Koordinator MK,Dosen Pengampu';
+            $rules['alasan_setting'] = 'required|string';
+            if (in_array($request->input('posisi_pengaju'), ['Dosen Pengampu', 'Kaprodi'])) {
+                $rules['sudah_koordinasi'] = 'required|string|in:Ya,Tidak';
+            }
+        } elseif ($category === 'Verifikasi & Dispensasi Akademik') {
+            $rules['detail_pertanyaan'] = 'required|string';
+            $rules['upload_link_persyaratan'] = 'required|string';
+            $rules['batas_waktu'] = 'required|date';
+        } else {
+            $rules['description'] = 'required|string';
+        }
+
+        $validated = $request->validate($rules);
+
+        $ticket = DB::transaction(function () use ($request, $category) {
             $maxId = Ticket::lockForUpdate()->max('id') ?? 0;
             $ticketNumber = 'BPA-'.date('Y').'-'.str_pad($maxId + 1, 3, '0', STR_PAD_LEFT);
 
-            $ticket = Ticket::create([
+            $ticketData = [
                 'ticket_number' => $ticketNumber,
                 'user_id' => $request->user()->id,
                 'category' => $request->category,
                 'subject' => $request->subject,
-                'description' => $request->description,
                 'status' => 'Open',
-            ]);
+            ];
+
+            if ($category === 'Data & Informasi Kurikulum') {
+                $ticketData['detail_data'] = $request->detail_data;
+                $ticketData['link_format_data'] = $request->link_format_data;
+            } elseif ($category === 'Monitoring & Evaluasi OBE') {
+                $ticketData['detail_tujuan'] = $request->detail_tujuan;
+            } elseif ($category === 'Pengelolaan Kurikulum & Mata Kuliah') {
+                $ticketData['detail_dokumen_tujuan'] = $request->detail_dokumen_tujuan;
+            } elseif ($category === 'Setting RPS & Komponennya') {
+                $ticketData['detail_pertanyaan'] = $request->detail_pertanyaan;
+                $ticketData['posisi_pengaju'] = $request->posisi_pengaju;
+                $ticketData['alasan_setting'] = $request->alasan_setting;
+                if (in_array($request->posisi_pengaju, ['Dosen Pengampu', 'Kaprodi'])) {
+                    $ticketData['sudah_koordinasi'] = $request->sudah_koordinasi;
+                }
+            } elseif ($category === 'Verifikasi & Dispensasi Akademik') {
+                $ticketData['detail_pertanyaan'] = $request->detail_pertanyaan;
+                $ticketData['upload_link_persyaratan'] = $request->upload_link_persyaratan;
+                $ticketData['batas_waktu'] = $request->batas_waktu;
+            } else {
+                $ticketData['description'] = $request->description;
+            }
+
+            $ticket = Ticket::create($ticketData);
 
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {

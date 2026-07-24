@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Award, GraduationCap, Briefcase, Handshake, Search, ArrowLeft } from 'lucide-react';
+import { Award, GraduationCap, BookOpen, Activity, Sliders, Search, ArrowLeft } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -14,21 +14,25 @@ const isSlaOverdue = (ticket: any) => {
 };
 
 const CATEGORY_CONFIG = {
-    'Data Sertifikasi Dosen': {
-        description: 'Pengajuan dan verifikasi sertifikasi dosen BPA.',
-        icon: Award,
-    },
-    'Data Mahasiswa': {
-        description: 'Kelola data akademik dan status mahasiswa.',
+    'Data & Informasi Kurikulum': {
+        description: 'Kelola data dan dokumen kurikulum program studi.',
         icon: GraduationCap,
     },
-    'Program Magang Berdampak': {
-        description: 'Layanan magang industri dan program berdampak.',
-        icon: Briefcase,
+    'Monitoring & Evaluasi OBE': {
+        description: 'Layanan monitoring dan evaluasi kurikulum berbasis OBE.',
+        icon: Activity,
     },
-    'Data Kerjasama': {
-        description: 'Administrasi dan dokumen kerjasama institusi.',
-        icon: Handshake,
+    'Pengelolaan Kurikulum & Mata Kuliah': {
+        description: 'Pengaturan operasional kurikulum dan mata kuliah program studi.',
+        icon: BookOpen,
+    },
+    'Setting RPS & Komponennya': {
+        description: 'Layanan penyusunan dan persetujuan Rencana Pembelajaran Semester.',
+        icon: Sliders,
+    },
+    'Verifikasi & Dispensasi Akademik': {
+        description: 'Verifikasi dokumen dan pengajuan dispensasi akademik mahasiswa/dosen.',
+        icon: Award,
     },
 };
 

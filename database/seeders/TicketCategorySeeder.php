@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\TicketCategory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,14 +14,18 @@ class TicketCategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            'Data Sertifikasi Dosen',
-            'Data Mahasiswa',
-            'Program Magang Berdampak',
-            'Data Kerjasama'
+            'Data & Informasi Kurikulum',
+            'Monitoring & Evaluasi OBE',
+            'Pengelolaan Kurikulum & Mata Kuliah',
+            'Setting RPS & Komponennya',
+            'Verifikasi & Dispensasi Akademik'
         ];
-
+    
         foreach ($categories as $category) {
-            \App\Models\TicketCategory::create(['name' => $category]);
+            TicketCategory::updateOrCreate(
+                ['name' => $category],
+                ['description' => 'Kategori tiket terkait layanan ' . $category]
+            );
         }
     }
 }

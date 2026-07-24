@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['ticket_number', 'user_id', 'category', 'subject', 'description', 'status', 'admin_id', 'rating', 'feedback'])]
+#[Fillable(['ticket_number', 'user_id', 'category', 'subject', 'description', 'status', 'admin_id', 'rating', 'feedback', 'detail_data', 'link_format_data', 'detail_tujuan', 'detail_dokumen_tujuan', 'detail_pertanyaan', 'posisi_pengaju', 'sudah_koordinasi', 'alasan_setting', 'upload_link_persyaratan', 'batas_waktu'])]
 class Ticket extends Model
 {
     protected $fillable = [
@@ -20,6 +20,16 @@ class Ticket extends Model
         'admin_id',
         'rating',
         'feedback',
+        'detail_data',
+        'link_format_data',
+        'detail_tujuan',
+        'detail_dokumen_tujuan',
+        'detail_pertanyaan',
+        'posisi_pengaju',
+        'sudah_koordinasi',
+        'alasan_setting',
+        'upload_link_persyaratan',
+        'batas_waktu',
     ];
 
     public function attachments(): HasMany

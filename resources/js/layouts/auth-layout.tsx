@@ -11,7 +11,9 @@ export default function AuthLayout({
 }) {
     return (
         <AuthLayoutTemplate title={title} description={description}>
-            {children}
+            <div className="animate-fade-in">
+                {children}
+            </div>
         </AuthLayoutTemplate>
     );
 }

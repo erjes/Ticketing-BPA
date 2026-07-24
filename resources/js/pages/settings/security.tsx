@@ -23,15 +23,15 @@ export default function Security(props: Props) {
 
     return (
         <>
-            <Head title="Security settings" />
+            <Head title="Keamanan Akun" />
 
-            <h1 className="sr-only">Security settings</h1>
+            <h1 className="sr-only">Keamanan Akun</h1>
 
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Update password"
-                    description="Ensure your account is using a long, random password to stay secure"
+                    title="Perbarui Kata Sandi"
+                    description="Pastikan akun Anda menggunakan kata sandi yang kuat dan aman untuk melindungi akses data."
                 />
 
                 <Form
@@ -59,32 +59,32 @@ export default function Security(props: Props) {
                     {({ errors, processing }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="current_password">
-                                    Current password
+                                <Label htmlFor="current_password" className="text-xs font-bold text-foreground/80">
+                                    Kata Sandi Saat Ini
                                 </Label>
 
                                 <PasswordInput
                                     id="current_password"
                                     ref={currentPasswordInput}
                                     name="current_password"
-                                    className="mt-1 block w-full"
+                                    className="mt-1 block w-full rounded-xl h-11 border-border"
                                     autoComplete="current-password"
-                                    placeholder="Current password"
+                                    placeholder="Masukkan kata sandi saat ini"
                                 />
 
                                 <InputError message={errors.current_password} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password">New password</Label>
+                                <Label htmlFor="password" className="text-xs font-bold text-foreground/80">Kata Sandi Baru</Label>
 
                                 <PasswordInput
                                     id="password"
                                     ref={passwordInput}
                                     name="password"
-                                    className="mt-1 block w-full"
+                                    className="mt-1 block w-full rounded-xl h-11 border-border"
                                     autoComplete="new-password"
-                                    placeholder="New password"
+                                    placeholder="Masukkan kata sandi baru"
                                     passwordrules={props.passwordRules}
                                 />
 
@@ -92,16 +92,16 @@ export default function Security(props: Props) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
+                                <Label htmlFor="password_confirmation" className="text-xs font-bold text-foreground/80">
+                                    Konfirmasi Kata Sandi
                                 </Label>
 
                                 <PasswordInput
                                     id="password_confirmation"
                                     name="password_confirmation"
-                                    className="mt-1 block w-full"
+                                    className="mt-1 block w-full rounded-xl h-11 border-border"
                                     autoComplete="new-password"
-                                    placeholder="Confirm password"
+                                    placeholder="Ketik ulang kata sandi baru"
                                     passwordrules={props.passwordRules}
                                 />
 
@@ -110,12 +110,13 @@ export default function Security(props: Props) {
                                 />
                             </div>
 
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4 pt-2">
                                 <Button
                                     disabled={processing}
+                                    className="bg-[#8c1515] hover:bg-[#7a1212] text-white font-bold px-6 h-11 rounded-xl shadow-xs transition-all active:scale-[0.98]"
                                     data-test="update-password-button"
                                 >
-                                    Save
+                                    Simpan Kata Sandi
                                 </Button>
                             </div>
                         </>
@@ -123,11 +124,15 @@ export default function Security(props: Props) {
                 </Form>
             </div>
 
+            <div className="border-t border-border/60 my-6"></div>
+
             <ManageTwoFactor
                 canManageTwoFactor={props.canManageTwoFactor}
                 requiresConfirmation={props.requiresConfirmation}
                 twoFactorEnabled={props.twoFactorEnabled}
             />
+
+            <div className="border-t border-border/60 my-6"></div>
 
             <ManagePasskeys
                 canManagePasskeys={props.canManagePasskeys}
@@ -140,7 +145,7 @@ export default function Security(props: Props) {
 Security.layout = {
     breadcrumbs: [
         {
-            title: 'Security settings',
+            title: 'Keamanan Akun',
             href: edit(),
         },
     ],
